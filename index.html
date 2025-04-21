@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+  <button id="openWindow">🪟 새 창으로 보기</button>
+  <div style="display: flex; width: 1000px; height: 600px">
+    <textarea id="md" style="flex: 1; resize: none">
+---
+marp: true
+theme: gaia
+_class: lead
+paginate: true
+#backgroundColor: #000000
+#color: #ffffff
+backgroundImage: url('https://marp.app/assets/hero-background.svg')
+---
+
+# 천주교 합동미사
+
+2025년 4월 20일
+
+---
+
+## 부활 삼종 기도
+
+○ 하늘의 모후님, 기뻐하소서. 알렐루야.
+
+● 태중에 모시던 아드님이, 알렐루야.
+
+○ 말씀하신 대로 부활하셨나이다. 알렐루야.
+
+● 저희를 위하여 하느님께 빌어주소서. 알렐루야.
+
+○ 동정 마리아님, 기뻐하시며 즐거워하소서. 알렐루야.
+
+● 주님께서 참으로 부활하셨나이다. 알렐루야.
+    </textarea>
+    <div id="render" style="flex: 1; overflow-y: auto"></div>
+  </div>
+  <script type="module">
+    import { Marp } from 'https://esm.sh/@marp-team/marp-core?bundle'
+    import browser from 'https://esm.sh/@marp-team/marp-core/browser'
+    const marp = new Marp({ script: false })
+
+    function preview() {
+      const { html, css } = marp.render(md.value);
+      render.innerHTML = `${html}<style>${css}</style>`;
+      browser(render);
+    }
+
+    md.addEventListener('input', () => {
+      preview();
+    });
+
+
+    document.getElementById('openWindow').addEventListener('click', () => {
+      const mdContent = document.getElementById('md').value;
+      const { html, css } = marp.render(mdContent);
+      const slideWindow = window.open('#2', '_blank');
+      slideWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+          <meta charset="UTF-8">
+          <style>${css}</style>
+        </head>
+        <body>${html}</body>
+        </html>
+      `);
+      browser(slideWindow.document.body);
+    });
+
+    preview();
+  </script>
+</body>
+</html>
