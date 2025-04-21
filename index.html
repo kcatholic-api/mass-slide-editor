@@ -93,7 +93,7 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
   function preview() {
     const { html, css } = marp.render(md.value);
     render.innerHTML = `${html}<style>${css}</style>`;
-    browser(render);
+    //browser(render);
   }
 
   md.addEventListener('input', () => {
@@ -115,9 +115,30 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
       <body>${html}</body>
       </html>
     `);
-    browser(slideWindow.document.body);
+    //browser(slideWindow.document.body);
   });
 
   preview();
+
+  const decompress = base64string => {
+    const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
+    const cs = new DecompressionStream('gzip');
+    const writer = cs.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(cs.readable).arrayBuffer().then(function (arrayBuffer) {
+        return new TextDecoder().decode(arrayBuffer);
+    });
+  }
+
+
+  if(window.location.hash != '') {
+    const b64str = window.location.hash.slice(1);
+    decompress(b64str).then(function(str) {
+      document.getElementById('md').value = str;
+      preview();
+    });
+  }
+
 </script>
 </html>
