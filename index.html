@@ -232,6 +232,7 @@ function set_link(flag) {
   }
 }
 set_link(true);
+
 </script>
 
 <script type="module">
@@ -269,6 +270,8 @@ set_link(true);
   });
 
   preview();
+
+  ace_editor.getSession().on("change", preview);
 
   const decompress = base64string => {
     const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
