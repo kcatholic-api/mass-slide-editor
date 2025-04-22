@@ -10,7 +10,10 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.40.0/ace.js" integrity="sha512-fIGectJ0WRU6B2gx99VwpUsCu5T3pqAkPOLE2BJD5wowKmpejvdYg62WvsQ6f3jfOC5EGL0y0ZLcXnnc+oWG9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
     <!--<link rel="icon" href="favicon.ico">-->
@@ -41,14 +44,38 @@
   </div>
 </nav>
 
-<main class="container">
-  <div class="row">
-    <button id="openWindow">🪟 새 창으로 보기</button>
-  </div>
+<main class="container-fluid">
   <div class="row">
     <div class="col-md-6">
-      <textarea id="md" style="flex: 1; resize: none; width: 100%; height: 100%">
----
+      <table style="width: 100%">
+        <tr>
+          <td>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick=""><i class="bi bi-folder2-open"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick=""><i class="bi bi-floppy2"></i></button>
+          </td>
+          <td style="text-align: right;">
+            <input class="form-check-input" type="checkbox" value="" id="vim_mode" onclick="set_keybinding(this.checked)">
+            <label class="form-check-label" for="vim_mode">
+              Vim 키바인딩
+            </label>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <table style="width: 100%">
+        <tr>
+          <td style="text-align: right;">
+            <button type="button" id="openWindow" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="프레젠테이션" onclick=""><i class="bi bi-easel2"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장" onclick=""><i class="bi bi-printer"></i></button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id="mdrow" class="row">
+    <div class="col-md-6" id="leftPane" style="overflow-y: scroll; height: 100%">
+      <div id="editor" style="height: 100%; width: 100%; border-style: solid; border-color: #eeeeee">---
 marp: true
 theme: gaia
 _class: lead
@@ -64,7 +91,7 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
 
 ---
 
-## 부활 삼종 기도
+## 활 삼종 기도
 
 ○ 하늘의 모후님, 기뻐하소서. 알렐루야.
 
@@ -77,32 +104,84 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
 ○ 동정 마리아님, 기뻐하시며 즐거워하소서. 알렐루야.
 
 ● 주님께서 참으로 부활하셨나이다. 알렐루야.
-      </textarea>
+      </div>
     </div>
-    <div class="col-md-6">
-      <div id="render" style="flex: 1; overflow-y: auto"></div>
+    <div id="rightPane" class="col-md-6" style="height: 100%">
+      <div id="render" style="flex: 1; overflow-y: scroll; height: 100%"></div>
     </div>
   </div>
 </main>
+  <footer style="text-align: center" class="pt-2">
+    <p class="fs-6">평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 카톨릭 API 프로젝트</a>를 방문하여 보세요.</p>
+  </footer>
   </body>
+
+<script>
+console.log("script");
+var ace_editor = ace.edit("editor");
+ace_editor.session.setMode("ace/mode/markdown");
+ace_editor.session.setUseWrapMode(true);
+ace_editor.commands.addCommand({
+  name: 'save',
+  bindKey: {win: "Ctrl-S", "mac": "cmd-S"},
+  exec: function(editor) {
+  }
+});
+ace_editor.setOptions({
+  fontFamily: "Monospace",
+  fontSize: "12pt"
+});
+
+function set_keybinding(flag) {
+  if(flag) {
+    ace_editor.setKeyboardHandler("ace/keyboard/vim");
+    ace.config.loadModule("ace/keyboard/vim", function(module) {
+      var vimAPI = module.CodeMirror.Vim;
+      vimAPI.defineEx("wirte", "w", function(cm, input) {
+        // save_edit()
+      });
+    });
+  } else
+    ace_editor.setKeyboardHandler("ace/keyboard/vscode");
+}
+
+function set_editor_height() {
+  var guessheight = $(window).height() - $("#mdrow").offset().top - 50;
+  $("#mdrow").css("height", guessheight);
+  if($(window).width() < 768) {
+    $("#leftPane").css("height", "50%");
+    $("#rightPane").css("height", "50%");
+  } else {
+    $("#leftPane").css("height", "100%");
+    $("#rightPane").css("height", "100%");
+  }
+}
+
+$(window).on("resize", set_editor_height);
+set_editor_height();
+</script>
+
 <script type="module">
   import { Marp } from 'https://esm.sh/@marp-team/marp-core?bundle'
   import browser from 'https://esm.sh/@marp-team/marp-core/browser'
   const marp = new Marp({ script: false })
+  console.log("module");
+  console.log(ace_editor);
 
   function preview() {
-    const { html, css } = marp.render(md.value);
+    const { html, css } = marp.render(ace_editor.getValue().trim());
     render.innerHTML = `${html}<style>${css}</style>`;
     //browser(render);
   }
 
-  md.addEventListener('input', () => {
+  editor.addEventListener('input', () => {
+    console.log('haha');
     preview();
   });
 
 
   document.getElementById('openWindow').addEventListener('click', () => {
-    const mdContent = document.getElementById('md').value;
+    const mdContent = ace_editor.getValue().trim();
     const { html, css } = marp.render(mdContent);
     const slideWindow = window.open('#2', '_blank');
     slideWindow.document.write(`
@@ -135,7 +214,7 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
   if(window.location.hash != '') {
     const b64str = window.location.hash.slice(1);
     decompress(b64str).then(function(str) {
-      document.getElementById('md').value = str;
+      ace_editor.setValue(str.trim());
       preview();
     });
   }
