@@ -85,7 +85,7 @@
           </td>
           <td style="text-align: right;">
             <input class="form-check-input" type="checkbox" value="" id="vim_mode" onclick="set_keybinding(this.checked)">
-            <label class="form-check-label" for="vim_mode">
+            <label class="form-check-label" for="vim_mode" data-bs-toggle="tooltip" data-bs-placement="top" title="Vim 키 바인딩으로 편집합니다">
               Vim 키바인딩
             </label>
           </td>
@@ -98,12 +98,12 @@
           <td>
             <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
-            <label class="form-check-label" for="flexSwitchCheckChecked">스크롤 연결</label>
+            <label class="form-check-label" for="flexSwitchCheckChecked" data-bs-toggle="tooltip" data-bs-placement="top" title="왼쪽 편집기와 오른쪽 미리보기의 스크롤을 연결하거나 독립적으로 스크롤 합니다">스크롤 연결</label>
           </div>
           </td>
           <td style="text-align: right;">
-            <button type="button" id="openWindow" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="프레젠테이션" onclick=""><i class="bi bi-easel2"></i></button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장" onclick=""><i class="bi bi-printer"></i></button>
+            <button type="button" id="openWindow" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우져를 이용한 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
           </td>
         </tr>
       </table>
@@ -153,6 +153,9 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
   </body>
 
 <script>
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
 console.log("script");
 var ace_editor = ace.edit("editor");
 ace_editor.session.setMode("ace/mode/markdown");
