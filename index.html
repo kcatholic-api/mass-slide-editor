@@ -58,11 +58,23 @@
           </ul>
         </li>
       </ul>
+      <!--
+      <form class="form-inline my-2 my-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="https://marpit.marp.app/markdown" target="_blank">Marpit Markdown 도움말</a>
+          </li>
+        </ul>
+      </form>
+      -->
     </div>
   </div>
 </nav>
 
 <main class="container-fluid">
+  <div class="row">
+    <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운 문법을 사용하는 Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 만들어 줄 수 있답니다. 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만 당신도 쉽게 배울 수 있을 지도 몰라요. 자세한 문법 설명은 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 참고 하세요.</small></p>
+  </div>
   <div class="row">
     <div class="col-md-6">
       <table style="width: 100%">
@@ -83,6 +95,12 @@
     <div class="col-md-6">
       <table style="width: 100%">
         <tr>
+          <td>
+            <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
+            <label class="form-check-label" for="flexSwitchCheckChecked">스크롤 연결</label>
+          </div>
+          </td>
           <td style="text-align: right;">
             <button type="button" id="openWindow" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="프레젠테이션" onclick=""><i class="bi bi-easel2"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장" onclick=""><i class="bi bi-printer"></i></button>
@@ -130,7 +148,7 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
   </div>
 </main>
   <footer style="text-align: center" class="pt-2">
-    <p class="fs-6">평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 카톨릭 API 프로젝트</a>를 방문하여 보세요.</p>
+    <p class="fs-6"><small>평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 카톨릭 API 프로젝트</a>를 방문하여 보세요.</small></p>
   </footer>
   </body>
 
@@ -147,7 +165,7 @@ ace_editor.commands.addCommand({
 });
 ace_editor.setOptions({
   fontFamily: "Monospace",
-  fontSize: "12pt"
+  fontSize: "11pt"
 });
 
 function set_keybinding(flag) {
@@ -200,8 +218,17 @@ function l2r(ev) {
     $("#render").on("scroll", r2l);
   }, 100)
 }
-$("#render").on("scroll", r2l);
-ace_editor.session.on("changeScrollTop", l2r);
+
+function set_link(flag) {
+  if(flag) {
+    $("#render").on("scroll", r2l);
+    ace_editor.session.on("changeScrollTop", l2r);
+  } else {
+    $("#render").off("scroll", r2l);
+    ace_editor.session.off("changeScrollTop", l2r);
+  }
+}
+set_link(true);
 </script>
 
 <script type="module">
