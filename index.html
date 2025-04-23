@@ -637,7 +637,7 @@ function toggle_dark_mode() {
   if(window.location.hash != '') {
     load_from_hash();
   } else {
-    const response = await fetch('tutorial.md');
+    const response = await fetch('https://raw.githubusercontent.com/kcatholic-api/mass-slide-editor/refs/heads/main/tutorial.md');
     ace_editor.setValue(await response.text());
   }
 
