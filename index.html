@@ -57,6 +57,14 @@
             <li><a class="dropdown-item" href="#">12월</a></li>
           </ul>
         </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">기도문 추가</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">주기도문</a></li>
+            <li><a class="dropdown-item" href="#">사도신경</a></li>
+            <li><a class="dropdown-item" href="#">삼종기도</a></li>
+          </ul>
+        </li>
       </ul>
       <!--
       <form class="form-inline my-2 my-lg-0">
@@ -73,7 +81,7 @@
 
 <main class="container-fluid">
   <div class="row">
-    <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운 문법을 사용하는 Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 만들어 줄 수 있답니다. 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만 당신도 쉽게 배울 수 있을 지도 몰라요. 자세한 문법 설명은 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 참고 하세요.</small></p>
+    <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
   </div>
   <div class="row">
     <div class="col-md-6">
@@ -82,6 +90,8 @@
           <td>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick=""><i class="bi bi-folder2-open"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick=""><i class="bi bi-floppy2"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick=""><i class="bi bi-copy"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" onclick=""><i class="bi bi-box-arrow-up"></i></button>
           </td>
           <td style="text-align: right;">
             <input class="form-check-input" type="checkbox" value="" id="vim_mode" onclick="set_keybinding(this.checked)">
@@ -143,7 +153,7 @@ backgroundImage: url('https://marp.app/assets/hero-background.svg')
       </div>
     </div>
     <div id="rightPane" class="col-md-6" style="height: 100%">
-      <div id="render" style="flex: 1; overflow-y: scroll; height: 100%"></div>
+      <div id="render" style="flex: 1; overflow-y: scroll; height: 100%; border-style: solid; border-color: #eeeeee"></div>
     </div>
   </div>
 </main>
@@ -233,6 +243,12 @@ function set_link(flag) {
 }
 set_link(true);
 
+$("#readMore").on("click", function() {
+  var $this = $(this);
+  $("#dotdotdot").text($("#dotdotdot").text() == ""?"...":"")
+  $this.text($this.text() == '더 보기' ? '간략히' : '더 보기');
+  set_editor_height();
+});
 </script>
 
 <script type="module">
