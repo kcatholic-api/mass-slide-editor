@@ -24,7 +24,7 @@
   <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">미사 슬라이드덱 편집기</a>
+    <a class="navbar-brand" href="">미사 슬라이드덱 편집기</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -82,28 +82,57 @@
 </nav>
 
 <!-- Load Modal -->
-<div class="modal fade" id="loadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="loadModal" tabindex="-1" aria-labelledby="loadModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">로컬 브라우져 저장소 불러오기</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h1 class="modal-title fs-5" id="loadModalLabel">로컬 브라우져 저장소 불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
       </div>
       <div class="modal-body">
         <div class="list-group" id="saved">
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="shareModalLabel">다른 슬라이드덱 봉사자와 편집 내용 공유하기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <small>편집 중인 마크다운 소스를 직접 파일에 저장 또는 Email로 공유 하거나 다음의 주소를 보내어 다른 사람과 편집 내용을 쉽게 공유할 수 있습니다.</small>
+        </p>
+        <div class="card">
+          <h5 class="card-header">URL</h5>
+          <div class="card-body" id="shareURL">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="clipboard.copy($('#shareURL').text().trim());">복사</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <main class="container-fluid">
   <div class="row">
     <div id="alertdiv" class="alert alert-success" role="alert" style="display: none"></div>
-    <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
+    <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운(Markdown) 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
   </div>
   <div class="row">
     <div class="col-md-6">
@@ -113,7 +142,7 @@
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick="$('#loadModal').modal('show');update_saved_docs();"><i class="bi bi-folder2-open"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick="save_edit()"><i class="bi bi-floppy2"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick="clipboard_copy()"><i class="bi bi-copy"></i></button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" onclick=""><i class="bi bi-box-arrow-up"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" id="shareButton"><i class="bi bi-box-arrow-up"></i></button>
           </td>
           <td style="text-align: right;">
             <input class="form-check-input" type="checkbox" value="" id="vim_mode" onclick="set_keybinding(this.checked)">
@@ -417,6 +446,7 @@ function restore_edit(index) {
   }
 
   ace_editor.getSession().on("change", cache_save_handler);
+  $("#loadModal").modal("hide");
 }
 
 function restore_cache() {
@@ -433,6 +463,7 @@ function restore_cache() {
   }
 
   ace_editor.getSession().on("change", cache_save_handler);
+  $("#loadModal").modal("hide");
 }
 
 function update_saved_docs(highlight) {
@@ -551,6 +582,38 @@ $("#readMore").on("click", function() {
 
   ace_editor.getSession().on("change", preview);
 
+  document.getElementById('shareButton').addEventListener('click', async () => {
+    var data = ace_editor.getValue()
+
+    let stream = new Blob([data], {
+          type: 'text/plain',
+    }).stream();
+
+    const compressedReadableStream = stream.pipeThrough(
+        new CompressionStream("gzip")
+    );
+    const compressedResponse = await new Response(compressedReadableStream);
+    const blob = await compressedResponse.blob();
+
+    const buffer = await blob.arrayBuffer();
+
+    const compressedBase64 = btoa(
+      String.fromCharCode(
+        ...new Uint8Array(buffer)
+      )
+    );
+
+    var url = window.location.toString();
+    var hash_pos = url.search('#');
+    if(hash_pos > 0) {
+      url = url.slice(0, hash_pos);
+    }
+    url = url + "#"+compressedBase64;
+
+    $("#shareURL").text(url);
+    $("#shareModal").modal("show");
+  });
+
   const decompress = base64string => {
     const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
     const cs = new DecompressionStream('gzip');
@@ -562,14 +625,21 @@ $("#readMore").on("click", function() {
     });
   }
 
-
-  if(window.location.hash != '') {
-    const b64str = window.location.hash.slice(1);
-    decompress(b64str).then(function(str) {
-      ace_editor.setValue(str.trim());
-      preview();
-    });
+  function load_from_hash() {
+    if(window.location.hash != '') {
+      const b64str = window.location.hash.slice(1);
+      decompress(b64str).then(function(str) {
+        ace_editor.setValue(str.trim());
+        preview();
+      });
+    }
   }
+  window.addEventListener('hashchange', () => {
+    load_from_hash();
+  });
+
+  load_from_hash();
+
 
 </script>
 </html>
