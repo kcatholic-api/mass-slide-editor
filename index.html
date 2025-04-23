@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.40.0/ace.js" integrity="sha512-fIGectJ0WRU6B2gx99VwpUsCu5T3pqAkPOLE2BJD5wowKmpejvdYg62WvsQ6f3jfOC5EGL0y0ZLcXnnc+oWG9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago@1.6.7/jquery.timeago.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard-js@0.3.6/clipboard.min.js"></script>
 
 
     <!--<link rel="icon" href="favicon.ico">-->
@@ -79,8 +81,28 @@
   </div>
 </nav>
 
+<!-- Load Modal -->
+<div class="modal fade" id="loadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">로컬 브라우져 저장소 불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="saved">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <main class="container-fluid">
   <div class="row">
+    <div id="alertdiv" class="alert alert-success" role="alert" style="display: none"></div>
     <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본적 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
   </div>
   <div class="row">
@@ -88,9 +110,9 @@
       <table style="width: 100%">
         <tr>
           <td>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick=""><i class="bi bi-folder2-open"></i></button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick=""><i class="bi bi-floppy2"></i></button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick=""><i class="bi bi-copy"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick="$('#loadModal').modal('show');update_saved_docs();"><i class="bi bi-folder2-open"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick="save_edit()"><i class="bi bi-floppy2"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick="clipboard_copy()"><i class="bi bi-copy"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" onclick=""><i class="bi bi-box-arrow-up"></i></button>
           </td>
           <td style="text-align: right;">
@@ -282,7 +304,7 @@ ace_editor.session.setMode("ace/mode/markdown");
 ace_editor.session.setUseWrapMode(true);
 ace_editor.commands.addCommand({
   name: 'save',
-  bindKey: {win: "Ctrl-S", "mac": "cmd-S"},
+  bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
   exec: function(editor) {
   }
 });
@@ -297,7 +319,7 @@ function set_keybinding(flag) {
     ace.config.loadModule("ace/keyboard/vim", function(module) {
       var vimAPI = module.CodeMirror.Vim;
       vimAPI.defineEx("wirte", "w", function(cm, input) {
-        // save_edit()
+        save_edit()
       });
     });
   } else
@@ -352,6 +374,136 @@ function set_link(flag) {
   }
 }
 set_link(true);
+
+function clipboard_copy() {
+  clipboard.copy(ace_editor.getValue());
+  $("#alertdiv").html("현재 편집중인 내용을 클립보드에 복사 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+}
+
+function save_edit() {
+  var title = "제목 없음";
+  lines = ace_editor.getValue().split("\n");
+  dash_count = 0;
+  for(var i=0; i<lines.length; i++) {
+    var l = lines[i].trim();
+    if(l == "---")
+      dash_count += 1;
+    else if(dash_count >= 2 && l.startsWith("# ")) {
+      title = l.slice(2).trim();
+      var p = title.search("<!--");
+      if(p>0)
+        title = title.slice(0, p).trim();
+      break;
+    }
+  }
+
+  $("#alertdiv").html('"'+title+'"'+"<br/>이(가) 로컬 브라우져 저장소에 저장되었습니다").slideDown(500).delay(1000).slideUp(500);
+  localStorage.setItem(title, JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
+
+  update_saved_docs(title);
+}
+
+function restore_edit(index) {
+  ace_editor.getSession().off("change", cache_save_handler);
+
+  // load cache
+  for(var i=0; i<localStorage.length; i++) {
+    if(index == i) {
+      var cache = JSON.parse(localStorage.getItem(localStorage.key(i)));
+      ace_editor.setValue(cache.content);
+      update_saved_docs(localStorage.key(i));
+      break;
+    }
+  }
+
+  ace_editor.getSession().on("change", cache_save_handler);
+}
+
+function restore_cache() {
+  ace_editor.getSession().off("change", cache_save_handler);
+
+  // load cache
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(name == "cache") {
+      var cache = JSON.parse(localStorage.getItem(name));
+      ace_editor.setValue(cache.content);
+      break;
+    }
+  }
+
+  ace_editor.getSession().on("change", cache_save_handler);
+}
+
+function update_saved_docs(highlight) {
+  $("#saved").html("");
+
+  var count = 0;
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(name == "cache") {
+      var cache = {date: new Date, content: ""};
+      try {
+        cache = JSON.parse(localStorage.getItem("cache"));
+      } catch (e) {
+        continue;
+      }
+      var item = $('<a href="#" class="list-group-item list-group-item-action" onclick="restore_cache()">\
+        <div class="d-flex w-100 justify-content-between">\
+          <strong>[저장하지 않은 내용 복원]</strong>\
+          <small> \
+            <time class="timeago" datetime="'+cache.date+'"></time> \
+            <i class="bi bi-trash" onclick="localStorage.removeItem(localStorage.key('+i+')); update_saved_docs()"></i> \
+          </small> \
+        </div>\
+      </a>');
+      $("#saved").append(item);
+      count += 1;
+      break;
+    }
+  }
+
+  // load saved slides
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(name == "cache")
+      continue;
+    var content = {date: new Date, content: ""};
+    try {
+      content = JSON.parse(localStorage.getItem(localStorage.key(i)));
+    } catch (e) {
+      continue;
+    }
+    var active = "";
+    if(name == highlight)
+      active = " active";
+    var item = $('<a href="#" class="list-group-item list-group-item-action" onclick="restore_edit('+i+')">\
+      <div class="d-flex w-100 justify-content-between">\
+        '+name+'\
+        <small> \
+          <time class="timeago" datetime="'+content.date+'"></time> \
+          <i class="bi bi-trash" onclick="localStorage.removeItem(localStorage.key('+i+')); update_saved_docs()"></i> \
+        </small> \
+      </div>\
+    </a>');
+    $("#saved").append(item);
+    count += 1;
+  }
+
+  if(count == 0) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action">\
+      브라우져 로컬 저장소가 비었습니다.\
+    </a>');
+    $("#saved").append(item);
+  }
+  $("time.timeago").timeago();
+}
+
+function cache_save_handler() {
+  console.log("cache save");
+  localStorage.setItem("cache", JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
+}
+ace_editor.getSession().on("change", cache_save_handler);
 
 $("#readMore").on("click", function() {
   var $this = $(this);
