@@ -183,8 +183,8 @@
           </div>
           </td>
           <td style="text-align: right;">
-            <button type="button" id="openWindow" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우져를 이용한 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
+            <button type="button" id="presentationButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우져를 이용한 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
+            <button type="button" id="printButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
           </td>
         </tr>
       </table>
@@ -544,10 +544,24 @@ function toggle_dark_mode() {
   });
 
 
-  document.getElementById('openWindow').addEventListener('click', () => {
+  document.getElementById('presentationButton').addEventListener('click', async () => {
     const mdContent = ace_editor.getValue().trim();
     const { html, css } = marp.render(mdContent);
-    const slideWindow = window.open('#2', '_blank');
+
+    const response = await fetch('presentation-template.html');
+    const template = await response.text();
+    const stripped_html = html.replace('<div class="marpit">', '');
+    const rendered = template.replace("{{HTML}}", stripped_html)
+
+    const slideWindow = window.open('', '_blank');
+    slideWindow.document.write(rendered);
+    //browser(slideWindow.document.body);
+  });
+
+  document.getElementById('printButton').addEventListener('click', () => {
+    const mdContent = ace_editor.getValue().trim();
+    const { html, css } = marp.render(mdContent);
+    const slideWindow = window.open('', '_blank');
     slideWindow.document.write(`
       <!DOCTYPE html>
       <html lang="ko">
@@ -558,7 +572,8 @@ function toggle_dark_mode() {
       <body>${html}</body>
       </html>
     `);
-    //browser(slideWindow.document.body);
+    slideWindow.print();
+    slideWindow.close();
   });
 
   preview();
