@@ -362,7 +362,7 @@ function restore_edit(index) {
   // load cache
   for(var i=0; i<localStorage.length; i++) {
     if(index == i) {
-      var title = localStorage.key(i);
+      var title = localStorage.key(i).replace("kcatolic-api.", "");
       var cache = JSON.parse(localStorage.getItem(title));
       ace_editor.setValue(cache.content, -1);
       ace_editor.session.setScrollTop(0);
