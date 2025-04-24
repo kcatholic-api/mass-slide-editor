@@ -816,8 +816,30 @@ function load_marp_md_by_file(year, filename) {
     });
   }
 
-  function load_from_hash() {
-    const b64str = window.location.hash.slice(1);
+  async function load_from_hash() {
+    const hashstring = window.location.hash.slice(1);
+    var n = new Date();
+    if(hashstring == "today") {
+      load_marp_md(+new Date());
+      return;
+    } else if(hashstring == "tomorrow") {
+      load_marp_md(+new Date() + 86400000);
+      return;
+    } else if(hashstring == "saturday") {
+      load_marp_md(+n+86400000*(6-n.getDay()));
+      return;
+    } else if(hashstring == "sunday") {
+      load_marp_md(+n+86400000*(7-n.getDay()));
+      return;
+    } else if(hashstring.startsWith("2025") && hashstring.length<=10) {
+      var url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/2025/'+hashstring+'.md';
+      const response = await fetch(url);
+      ace_editor.setValue(await response.text(), -1);
+      ace_editor.session.setScrollTop(0);
+      $("#alertdiv").html(hashstring+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      return;
+    }
+    const b64str = hashstring;
     decompress(b64str).then(function(str) {
       ace_editor.setValue(str.trim(), -1);
       ace_editor.session.setScrollTop(0);
