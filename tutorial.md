@@ -15,9 +15,10 @@ backgroundImage: url("https://marp.app/assets/hero-background.svg")
 
 ![h:250](https://kcatholic-api.github.io/abudhabi/logo.svg)
 
-## 예제를 통해 5분만에 배워 봅시다
+## 5분 코스로 본능에 따라
 
-왼쪽 편집기에서 Markdown 코드를 수정해 보세요
+왼쪽 편집기에서 Markdown 코드를 수정하며 
+예제를 씹고 뜯고 맛보고 즐기면서 익숙해져 보는 시간
 
 <!-- 커버 페이지 입니다.
 Heading 1(#)을 사용하여 제목을 중간에 위치해 보세요.
