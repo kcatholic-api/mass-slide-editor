@@ -163,6 +163,7 @@
 <main class="container-fluid">
   <div class="row">
     <div id="alertdiv" class="alert alert-success" role="alert" style="display: none"></div>
+    <div id="erroralertdiv" class="alert alert-danger" role="alert" style="display: none"></div>
     <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운(Markdown) 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본 경험이 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 본능에 따라 이것 저것 건드려 보세요. 또는 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
   </div>
   <div class="row">
@@ -570,7 +571,10 @@ function toggle_dark_mode() {
     const stripped_html = html.replace('<div class="marpit">', '');
     const rendered = template.replace("{{HTML}}", stripped_html)
 
-    const slideWindow = window.open('', '_blank');
+    const slideWindow = window.open('?view=presenter', '_blank');
+    if(!slideWindow) {
+      $("#erroralertdiv").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+    }
     slideWindow.document.write(rendered);
     //browser(slideWindow.document.body);
   });
@@ -579,6 +583,9 @@ function toggle_dark_mode() {
     const mdContent = ace_editor.getValue().trim();
     const { html, css } = marp.render(mdContent);
     const slideWindow = window.open('', '_blank');
+    if(!slideWindow) {
+      $("#erroralertdiv").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+    }
     slideWindow.document.write(`
       <!DOCTYPE html>
       <html lang="ko">
