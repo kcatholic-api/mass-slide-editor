@@ -599,12 +599,12 @@ function load_marp_md_by_file(year, filename) {
     const template = await response.text();
     const stripped_html = html.replace('<div class="marpit">', '');
     const rendered = template.replace("{{HTML}}", stripped_html)
+    localStorage.setItem("kcatolic-api.presentation", rendered);
 
-    const slideWindow = window.open('', '_blank');
+    const slideWindow = window.open('presentation.html', '_blank');
     if(!slideWindow) {
       $("#erroralertdiv").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
     }
-    slideWindow.document.write(rendered);
     //browser(slideWindow.document.body);
   });
 
@@ -768,7 +768,6 @@ function load_marp_md_by_file(year, filename) {
     $("#prayer_list").append(item);
 
     document.getElementById('p_'+i).addEventListener('click', async () => {
-      console.log(prayer_name);
       const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
       $("#progressdiv").html('<div class="spinner-border" role="status"></div> 데이타 가져오는 중...').slideDown(500);
       const response = await fetch(url);
@@ -785,7 +784,6 @@ function load_marp_md_by_file(year, filename) {
         var l = lines[i].trim();
         if(l=="---")
           dash_count += 1;
-        console.log(i, dash_count, pos.row, i, ready, done);
 
         if(dash_count > 2 && l=="---" && ready && !done) {
           ace_editor.gotoLine(i, 0);
