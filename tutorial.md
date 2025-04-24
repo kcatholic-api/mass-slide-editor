@@ -1,6 +1,6 @@
 ---
-# 첫장은 슬라이드덱 옵션을 YAML로 설정하는 용도 입니다
-# 주석(#)을 수정하고 값을 바꾸어 다양하게 꾸며 보세요
+# 첫장은 슬라이드덱 옵션을 YAML 포멧으로 설정하는 용도 입니다
+# 주석(#)을 제거하고 값을 바꾸며 다양한 방법으로 꾸며 보세요
 marp: true
 theme: gaia
 _class: lead
@@ -9,7 +9,7 @@ backgroundImage: url("https://marp.app/assets/hero-background.svg")
 #backgroundColor: #000000
 #color: #ffffff
 ---
-<!-- 여기서 부터 마크다운(Markdown) 으로 슬라이드를 작성 합니다 -->
+<!-- 여기서 부터 마크다운(Markdown) 문법으로 슬라이드를 작성 합니다 -->
 
 # 마크다운으로 천주교 미사 슬라이드덱 만들기
 
