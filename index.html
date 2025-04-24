@@ -31,16 +31,16 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#" id="load_today">오늘</a>
+          <a class="nav-link" aria-current="page" href="#today" id="load_today">오늘</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#" id="load_tomorrow">내일</a>
+          <a class="nav-link" aria-current="page" href="#tomorrow" id="load_tomorrow">내일</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#" id="load_saturday">이번 토요일</a>
+          <a class="nav-link" aria-current="page" href="#saturday" id="load_saturday">이번 토요일</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#" id="load_sunday">이번 일요일</a>
+          <a class="nav-link" aria-current="page" href="#sunday" id="load_sunday">이번 일요일</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">2025년</a>
@@ -694,6 +694,7 @@ function load_marp_md_by_file(year, filename) {
     $("#alertdiv").html(formatDate(t)+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
   }
 
+  /*
   document.getElementById('load_today').addEventListener('click', async () => {
     load_marp_md(+new Date());
   });
@@ -711,13 +712,14 @@ function load_marp_md_by_file(year, filename) {
     var n = new Date();
     load_marp_md(+n+86400000*(7-n.getDay()));
   });
+  */
 
   function listup_month(year, monthly_items) {
     var count = 0;
     $("#month_list").html("");
     for(var i=0; i<monthly_items.length; i++) {
       var info = monthly_items[i];
-      var item = $('<a href="#" class="list-group-item list-group-item-action" onclick="load_marp_md_by_file('+year+', \''+info.filename+'\')">\
+      var item = $('<a href="#'+info.filename.replace(".md", "")+'" class="list-group-item list-group-item-action">\
         <div class="d-flex w-100 justify-content-between">\
           '+info.date.slice(6)+'일\
           ('+info.day+') - \
@@ -837,6 +839,7 @@ function load_marp_md_by_file(year, filename) {
       ace_editor.setValue(await response.text(), -1);
       ace_editor.session.setScrollTop(0);
       $("#alertdiv").html(hashstring+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#monthModal").modal("hide");
       return;
     }
     const b64str = hashstring;
