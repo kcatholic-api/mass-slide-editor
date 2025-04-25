@@ -14,7 +14,7 @@ backgroundImage: url("https://marp.app/assets/hero-background.svg")
 
 <!-- 여기서 부터는 본격적으로 마크다운(Markdown) 문법으로 슬라이드를 작성 합니다 -->
 
-# 마크다운으로 천주교 미사 슬라이드덱 만들기
+# 마크다운으로 가톨릭 한국어 미사 슬라이드덱 만들기
 
 ![h:250](https://kcatholic-api.github.io/abudhabi/logo.svg)
 

@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>한국어 미사 슬라이드덱 편집기</title>
+    <meta name="description" content="생각보다 은근히 편리한 가톨릭 한국어 미사 슬라이드덱 편집기">
+    <!--<meta name="author" content="">-->
+    <title>생각보다 은근히 편리한 가톨릭 한국어 미사 슬라이드덱 편집기</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
@@ -24,7 +24,7 @@
   <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
   <div class="container-fluid">
-    <a class="navbar-brand" href="">미사 슬라이드덱 편집기</a>
+    <a class="navbar-brand" href="" id="menu_title">미사 슬라이드덱 편집기</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -182,7 +182,7 @@
     <div id="error_div" class="alert alert-danger" role="alert" style="display: none"></div>
   </div>
   <div class="row">
-    <p><small>생각보다 은근히 편리한 이 미사 슬라이드덱 편집기는 마크다운(Markdown) 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본 경험이 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 본능에 따라 이것 저것 건드려 보세요. 또는 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도를 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
+    <p><small>생각보다 은근히 편리한 이 한국어 미사 슬라이드덱 편집기는 마크다운(Markdown) 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 가톨릭 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본 경험이 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 본능에 따라 이것 저것 건드려 보세요. 또는 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도를 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
   </div>
   <div class="row">
     <div class="col-md-6">
@@ -231,7 +231,7 @@
   </div>
 </main>
   <footer style="text-align: center" class="pt-2">
-    <p class="fs-6"><small>평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 카톨릭 API 프로젝트</a>를 방문하여 보세요.</small></p>
+    <p class="fs-6"><small>평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 가톨릭 API 프로젝트</a>를 방문하여 보세요.</small></p>
   </footer>
   </body>
 
@@ -580,6 +580,16 @@ function load_marp_md_by_file(year, filename) {
   });
   $("#monthModal").modal("hide");
 }
+function show_catch_phrase() {
+  $("#menu_title").text("생각보다 은근히 편한").fadeIn(500).delay(5000).fadeOut(500, show_menu_title);
+}
+function show_menu_title(fade=true) {
+  if(fade)
+    $("#menu_title").text("미사 슬라이드덱 편집기").fadeIn(500).delay(25000).fadeOut(500, show_catch_phrase);
+  else
+    $("#menu_title").text("미사 슬라이드덱 편집기").delay(25000).fadeOut(500, show_catch_phrase);
+}
+show_menu_title(false);
 </script>
 
 <script type="module">
