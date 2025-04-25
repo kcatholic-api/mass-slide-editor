@@ -1,6 +1,8 @@
 ---
-# 첫장은 슬라이드덱 옵션을 YAML 포멧으로 설정하는 용도 입니다
-# 주석(#)을 제거하고 값을 바꾸며 다양한 방법으로 꾸며 보세요
+# 이것은 Markdown의 메타데이타 코드 블록이며 Yaml frontmatter 라고 불리웁니다.
+# ---로 시작하여 ---로 끝나 감싸지며 오른쪽 미리보기에 나타나지 않습니다.
+# 전역적인 슬라이드덱 옵션을 Key:Value 의 Yaml 포멧으로 설정할 수 있습니다.
+# 값을 바꾸고 주석(#)을 제거해보세요. 더 보기 좋게 슬라이드덱을 꾸며 보세요!
 marp: true
 theme: gaia
 _class: lead
@@ -9,7 +11,8 @@ backgroundImage: url("https://marp.app/assets/hero-background.svg")
 #backgroundColor: #000000
 #color: #ffffff
 ---
-<!-- 여기서 부터 마크다운(Markdown) 문법으로 슬라이드를 작성 합니다 -->
+
+<!-- 여기서 부터는 본격적으로 마크다운(Markdown) 문법으로 슬라이드를 작성 합니다 -->
 
 # 마크다운으로 천주교 미사 슬라이드덱 만들기
 
