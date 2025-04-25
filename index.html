@@ -178,9 +178,8 @@
 
 <main class="container-fluid">
   <div class="row ms-1 me-1">
-    <div id="progressdiv" class="alert alert-info" role="alert" style="display: none"></div>
-    <div id="alertdiv" class="alert alert-success" role="alert" style="display: none"></div>
-    <div id="erroralertdiv" class="alert alert-danger" role="alert" style="display: none"></div>
+    <div id="notice_div" class="alert alert-primary" role="alert" style="display: none"></div>
+    <div id="error_div" class="alert alert-danger" role="alert" style="display: none"></div>
   </div>
   <div class="row">
     <p><small>이 생각보다 은근히 편리한 미사 슬라이드덱 편집기는 마크다운(Markdown) 문법을 사용하는 <span id="dotdotdot">...</span><span id="moreText" class="collapse">Marpit이라는 오픈소스 도구를 사용하여 천주교 미사를 위한 슬라이드 장표를 깔끔하게 만들어 줄 수 있답니다. 원래 코딩을 해본 경험이 있는 바쁜 교회 봉사자를 위하여 만들어 졌지만, 하느님의 은총으로 당신도 뚝딱 배워서 봉사에 사용할 수 있을 지도 몰라요. 본능에 따라 이것 저것 건드려 보세요. 또는 자세한 문법 설명이 있는 <a href="https://commonmark.org/help/tutorial/" target="_blank">마크다운 자습서</a>와 <a href="https://marpit.marp.app/markdown" target="_blank">Marpit 설명서</a>를 읽어 보신 후 주님의 기도 3번 바쳐보세요.</span> <a id="readMore" data-bs-toggle="collapse" href="#moreText" aria-expanded="false" aria-controls="moreText"><small>더 보기</small></a></small></p>
@@ -330,7 +329,7 @@ set_link(true);
 
 function clipboard_copy() {
   clipboard.copy(ace_editor.getValue());
-  $("#alertdiv").html("현재 편집중인 내용을 클립보드에 복사 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+  $("#notice_div").html("현재 편집중인 내용을 클립보드에 복사 하였습니다.").slideDown(500).delay(1000).slideUp(500);
 }
 
 function save_edit() {
@@ -350,7 +349,7 @@ function save_edit() {
     }
   }
 
-  $("#alertdiv").html('"'+title+'"'+"<br/>이(가) 로컬 브라우저 저장소에 저장되었습니다").slideDown(500).delay(1000).slideUp(500);
+  $("#notice_div").html('"'+title+'"'+"<br/>이(가) 로컬 브라우저 저장소에 저장되었습니다").slideDown(500).delay(1000).slideUp(500);
   localStorage.setItem("kcatolic-api."+title, JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
 
   update_saved_docs(title);
@@ -367,7 +366,7 @@ function restore_edit(index) {
       ace_editor.setValue(cache.content, -1);
       ace_editor.session.setScrollTop(0);
       update_saved_docs(localStorage.key(i));
-      $("#alertdiv").html("로컬 브라우저 저장소에서 \""+title+"\"을(를) 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#notice_div").html("로컬 브라우저 저장소에서 \""+title+"\"을(를) 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
       break;
     }
   }
@@ -386,7 +385,7 @@ function restore_cache() {
       var cache = JSON.parse(localStorage.getItem(name));
       ace_editor.setValue(cache.content, -1);
       ace_editor.session.setScrollTop(0);
-      $("#alertdiv").html("로컬 브라우저 저장소에서 임시 저장 되었던 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#notice_div").html("로컬 브라우저 저장소에서 임시 저장 되었던 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
       break;
     }
   }
@@ -568,9 +567,9 @@ function load_marp_md_by_file(year, filename) {
   $.get(url, function(data) {
     ace_editor.setValue(data, -1);
     ace_editor.session.setScrollTop(0);
-    $("#alertdiv").html(filename.replace(".md", "")+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+    $("#notice_div").html(filename.replace(".md", "")+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
   }).fail(function() {
-    $("#erroralertdiv").html("데이타를 불러오는데 실패하였습니다.").slideDown(500).delay(1000).slideUp(500);
+    $("#error_div").html("데이타를 불러오는데 실패하였습니다.").slideDown(500).delay(1000).slideUp(500);
   });
   $("#monthModal").modal("hide");
 }
@@ -605,7 +604,7 @@ function load_marp_md_by_file(year, filename) {
 
     const slideWindow = window.open('presentation.html', '_blank');
     if(!slideWindow) {
-      $("#erroralertdiv").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+      $("#error_div").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
     }
     //browser(slideWindow.document.body);
   });
@@ -615,7 +614,7 @@ function load_marp_md_by_file(year, filename) {
     const { html, css } = marp.render(mdContent);
     const slideWindow = window.open('', '_blank');
     if(!slideWindow) {
-      $("#erroralertdiv").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+      $("#error_div").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
     }
     slideWindow.document.write(`
       <!DOCTYPE html>
@@ -682,7 +681,7 @@ function load_marp_md_by_file(year, filename) {
   async function load_marp_md(ts) {
     const year = (new Date()).getFullYear();
     if(year != 2025) {
-      $("#erroralertdiv").html("2025년에만 사용할 수 있는 기능입니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#error_div").html("2025년에만 사용할 수 있는 기능입니다.").slideDown(500).delay(1000).slideUp(500);
       return;
     }
     var t = new Date(ts);
@@ -691,7 +690,7 @@ function load_marp_md_by_file(year, filename) {
     const response = await fetch(url);
     ace_editor.setValue(await response.text(), -1);
     ace_editor.session.setScrollTop(0);
-    $("#alertdiv").html(formatDate(t)+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+    $("#notice_div").html(formatDate(t)+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
   }
 
   /*
@@ -773,7 +772,7 @@ function load_marp_md_by_file(year, filename) {
 
     document.getElementById('p_'+i).addEventListener('click', async () => {
       const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
-      $("#progressdiv").html('<div class="spinner-border" role="status"></div> 데이타 가져오는 중...').slideDown(500);
+      $("#notice_div").html('<div class="spinner-border" role="status"></div> 데이타 불러오는 중...').slideDown(500);
       const response = await fetch(url);
       var md = await response.text();
 
@@ -802,7 +801,7 @@ function load_marp_md_by_file(year, filename) {
 
       preview();
 
-      $("#progressdiv").html(prayer_name+'을(를) 다음장에 추가 하였습니다.').slideDown(500).delay(1000).slideUp(500);
+      $("#notice_div").html(prayer_name+'을(를) 다음장에 추가 하였습니다.').slideDown(500).delay(1000).slideUp(500);
     });
   }
 
@@ -834,11 +833,12 @@ function load_marp_md_by_file(year, filename) {
       load_marp_md(+n+86400000*(7-n.getDay()));
       return;
     } else if(hashstring.startsWith("2025") && hashstring.length<=10) {
+      $("#notice_div").html('<div class="spinner-border" role="status"></div> 데이타 불러오는 중...').slideDown(500);
       var url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/2025/'+hashstring+'.md';
       const response = await fetch(url);
       ace_editor.setValue(await response.text(), -1);
       ace_editor.session.setScrollTop(0);
-      $("#alertdiv").html(hashstring+"의 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#notice_div").html(hashstring+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
       $("#monthModal").modal("hide");
       return;
     }
@@ -846,7 +846,7 @@ function load_marp_md_by_file(year, filename) {
     decompress(b64str).then(function(str) {
       ace_editor.setValue(str.trim(), -1);
       ace_editor.session.setScrollTop(0);
-      $("#alertdiv").html("공유링크에서 Markdown 문서를 추출하여 로드하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#notice_div").html("공유링크에서 Markdown 문서를 추출하여 로드하였습니다.").slideDown(500).delay(1000).slideUp(500);
       preview();
     });
   }
@@ -857,9 +857,11 @@ function load_marp_md_by_file(year, filename) {
   if(window.location.hash != '') {
     load_from_hash();
   } else {
+    $("#notice_div").html('<div class="spinner-border" role="status"></div> 자습서 Markdown 문서 불러오는 중...').slideDown(500);
     const response = await fetch('tutorial.md');
     ace_editor.setValue(await response.text(), -1);
     ace_editor.session.setScrollTop(0);
+    $("#notice_div").html("자습서 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
   }
 </script>
 </html>
