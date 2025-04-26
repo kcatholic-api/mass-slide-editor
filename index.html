@@ -858,14 +858,19 @@ show_menu_title(false);
 
 
   const decompress = base64string => {
-    const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
-    const cs = new DecompressionStream('gzip');
-    const writer = cs.writable.getWriter();
-    writer.write(bytes);
-    writer.close();
-    return new Response(cs.readable).arrayBuffer().then(function (arrayBuffer) {
-        return new TextDecoder().decode(arrayBuffer);
-    });
+    try {
+      const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
+      const cs = new DecompressionStream('gzip');
+      const writer = cs.writable.getWriter();
+      writer.write(bytes);
+      writer.close();
+      return new Response(cs.readable).arrayBuffer().then(function (arrayBuffer) {
+          return new TextDecoder().decode(arrayBuffer);
+      });
+    } catch (e) {
+      $("#error_div").html("뭔가 잘못되었습니다. ChatGPT에서 받은 링크로 들어 오셨다면, 한번 혼내주시고 제대로 된 링크를 만들어 달라고 해보세요.").slideDown(500).delay(5000).slideUp(500);
+      return;
+    }
   }
 
   async function load_from_hash() {
