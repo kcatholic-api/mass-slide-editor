@@ -2,6 +2,8 @@
 
 정적 HTML로 작성된 [Markdown](https://commonmark.org/)/[Marp](https://marp.app/) 기반의 슬라이드덱 편집기 입니다.
 
+[Online Demo](https://kcatholic-api.github.io/mass-slide-editor/)
+
 ## 주요 기능
 
 * Markdown 편집기 (vim keybinding 포함)
