@@ -17,6 +17,7 @@ backgroundImage: url("https://marp.app/assets/hero-background.svg")
 # 마크다운으로 한국어 미사 슬라이드덱 만들기
 
 ![h:250](https://kcatholic-api.github.io/abudhabi/logo.svg)
+<!-- 이미지/로고는 위와 같이 추가할 수 있습니다. h:250은 250px으로 height를 지정한 것입니다. -->
 
 ## 5분 코스로 본능에 따라
 
@@ -54,7 +55,7 @@ Heading 1(#)을 사용하여 제목을 중간에 위치해 보세요.
 
 <!-- Marpit Markdown 문법에 따라 페이지 분리선(---)으로 슬라이드덱을 추가할 수 있습니다 -->
 
-# 입당 성가 129 - 알렐루야 노래하자
+## 입당 성가 129 - 알렐루야 노래하자
 
 알렐루야 노래하자 기쁜때가- 왔도다
 
