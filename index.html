@@ -832,9 +832,11 @@ function never_see_startup() {
 $(document).ready(function() {
   show_menu_title(false);
 
-  if(localStorage.getItem(startup_dialog_version) != "no") {
-    console.log("show startup");
-    $("#startupModal").modal("show");
+  if(window.location.hash == "") {
+    if(localStorage.getItem(startup_dialog_version) != "no") {
+      console.log("show startup");
+      $("#startupModal").modal("show");
+    }
   }
 });
 
