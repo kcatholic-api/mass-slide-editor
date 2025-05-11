@@ -60,6 +60,32 @@
           </ul>
         </li>
         <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">성가 추가</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" id="hymn_0">1번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_1">100번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_2">200번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_3">300번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_4">400번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_5">500번 ~</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item hymn_menu" href="#">대림(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성탄(23)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">사순(16)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">부활(15)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성령(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성체(61)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성심(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">봉헌(17)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">참회(9) </a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">위령(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성모(52)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성인(16)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">축가(11)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">미사곡(93)</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">기도문 추가</a>
           <ul class="dropdown-menu" id="prayer_list">
           </ul>
@@ -169,6 +195,27 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hymn Modal -->
+<div class="modal fade" id="hymnModal" tabindex="-1" aria-labelledby="hymnModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="hymnModalLabel">불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="hymn_list">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="hymn_preview" class="alert alert-secondary" style="width: 100%" role="alert"></div>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="hymn_add_button" style="display: none" onclick="add_hymn()">추가</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
       </div>
     </div>
@@ -472,6 +519,61 @@ function cache_save_handler() {
   localStorage.setItem("kcatolic-api.cache", JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
 }
 ace_editor.getSession().on("change", cache_save_handler);
+
+
+function load_hymn(a, num) {
+  console.log(list);
+  var list = $("#hymn_list").children();
+  for(var i=0; i<list.length; i++) {
+    if(list[i] == a)
+      $(list[i]).addClass("active");
+    else
+      $(list[i]).removeClass("active");
+  }
+
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/'+num+'.md';
+  $.get(url, function(data) {
+    $("#hymn_preview").html(data.replaceAll("\n", "<br/>\n"));
+    $("#hymn_preview").show();
+    $("#hymn_add_button").show();
+  }).fail(function() {
+    console.log("fail")
+    $("#hymn_preview").text("성가 불러오기에 실패하였습니다.");
+    $("#hymn_preview").hide();
+    $("#hymn_add_button").hide();
+  });
+}
+
+function add_markdown(md) {
+    var pos = ace_editor.getCursorPosition();
+    var ready = false;
+    var done = false;
+    var lines = ace_editor.getValue().split("\n");
+    var dash_count = 0;
+    for(var i=0; i<lines.length; i++) {
+      if(pos.row == i)
+        ready = true;
+      var l = lines[i].trim();
+      if(l=="---")
+        dash_count += 1;
+
+      if(dash_count > 2 && l=="---" && ready && !done) {
+        ace_editor.gotoLine(i, 0);
+        ace_editor.insert("\n---\n\n"+md.trim()+"\n\n");
+        done = true;
+      }
+    }
+    if (!done) {
+      ace_editor.gotoLine(lines.length+1, 0);
+      ace_editor.insert("\n\n---\n\n"+md.trim());
+    }
+}
+
+function add_hymn() {
+  var md = $("#hymn_preview").text();
+  add_markdown(md);
+}
+
 
 $("#readMore").on("click", function() {
   var $this = $(this);
@@ -788,10 +890,40 @@ show_menu_title(false);
     }
   }
 
+  function load_hymnlist(hymns) {
+    var count = 0;
+    $("#hymn_list").html("");
+    $("#hymn_preview").hide();
+    $("#hymn_add_button").hide();
+    for(var i=0; i<hymns.length; i++) {
+      var info = hymns[i];
+      var item = $('<a href="#" class="list-group-item list-group-item-action"\
+        onclick="load_hymn(this, '+info.number+')">\
+        <div class="d-flex w-100 justify-content-between">\
+          <span>\
+            <b>'+info.number+'</b> \
+            '+info.title+'\
+          </span>\
+          <small> \
+            '+info.made_for+'\
+          </small> \
+        </div>\
+      </a>');
+      $("#hymn_list").append(item);
+      count += 1;
+    }
+
+    if(count == 0) {
+      var item = $('<a href="#" class="list-group-item list-group-item-action">\
+        불러 올 자료가 없습니다\
+      </a>');
+      $("#hymn_list").append(item);
+    }
+  }
+
   const year = (new Date()).getFullYear();
   const mass_indexes_url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/'+year+'/indexes.json';
-  const response = await fetch(mass_indexes_url);
-  var indexes = null;
+  var mass_indexes = null;
 
   for(var i=1; i<=12; i++) {
     const month = i;
@@ -800,12 +932,12 @@ show_menu_title(false);
       var m = ''+month;
       if(month < 10)
         m = '0'+month;
-      if (!indexes) {
+      if (!mass_indexes) {
         const response = await fetch(mass_indexes_url);
-        indexes = await response.json();
+        mass_indexes = await response.json();
       }
-      for (var i=0; i<indexes.length; i++) {
-        var info = indexes[i];
+      for (var i=0; i<mass_indexes.length; i++) {
+        var info = mass_indexes[i];
         if(info.filename.startsWith(year+m)) {
           monthly_items.push(info);
         }
@@ -814,6 +946,59 @@ show_menu_title(false);
 
       $("#monthModalLabel").text(""+month+"월 미사 목록");
       $("#monthModal").modal("show")
+    });
+  }
+
+  const hymn_indexes_url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/index.json';
+  var hymn_indexes = null;
+  for(var i=0; i<=5; i++) {
+    const numrange = i;
+    document.getElementById('hymn_'+numrange).addEventListener('click', async () => {
+      if (!hymn_indexes) {
+        console.log("hymn 다운로드");
+        const response = await fetch(hymn_indexes_url);
+        hymn_indexes = await response.json();
+      }
+
+      var hymns = [];
+      var from_number = numrange*100 + 1;
+      var to_number = numrange*100+100;
+      for(var i=from_number; i<to_number; i++) {
+        if(i in hymn_indexes.by_number) {
+          var info = hymn_indexes.by_number[i];
+          var title = info[0];
+          var made_for = info[1];
+          hymns.push({"number": i, "title":  title, "made_for": made_for});
+        }
+      }
+
+      load_hymnlist(hymns);
+
+      $("#hymnModalLabel").text("성가 "+from_number+"번 부터 "+to_number+"까지");
+      $("#hymnModal").modal("show")
+    });
+  }
+  const hymn_menus = document.getElementsByClassName("hymn_menu");
+  for(var i=0; i<hymn_menus.length; i++) {
+    const made_for = hymn_menus[i].innerText.split("(")[0];
+    hymn_menus[i].addEventListener('click', async () => {
+      if (!hymn_indexes) {
+        const response = await fetch(hymn_indexes_url);
+        hymn_indexes = await response.json();
+      }
+
+      var hymns = [];
+      for(var j=0; j<hymn_indexes.made_for[made_for].length; j++) {
+        var num = hymn_indexes.made_for[made_for][j];
+        var info = hymn_indexes.by_number[num];
+        var title = info[0];
+        hymns.push({"number": num, "title":  title, "made_for": ""});
+      }
+
+      load_hymnlist(hymns);
+
+      $("#hymnModalLabel").text(made_for);
+      $("#hymnModal").modal("show")
     });
   }
 
@@ -829,30 +1014,9 @@ show_menu_title(false);
       const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
       $("#notice_div").html('<div class="spinner-border" role="status"></div> 데이타 불러오는 중...').slideDown(500);
       const response = await fetch(url);
-      var md = await response.text();
+      var md = await response.text().trim();
 
-      var pos = ace_editor.getCursorPosition();
-      var ready = false;
-      var done = false;
-      var lines = ace_editor.getValue().split("\n");
-      var dash_count = 0;
-      for(var i=0; i<lines.length; i++) {
-        if(pos.row == i)
-          ready = true;
-        var l = lines[i].trim();
-        if(l=="---")
-          dash_count += 1;
-
-        if(dash_count > 2 && l=="---" && ready && !done) {
-          ace_editor.gotoLine(i, 0);
-          ace_editor.insert("\n---\n\n"+md.trim()+"\n\n");
-          done = true;
-        }
-      }
-      if (!done) {
-        ace_editor.gotoLine(lines.length+1, 0);
-        ace_editor.insert("\n\n---\n\n"+md.trim());
-      }
+      add_markdown(md);
 
       preview();
 
