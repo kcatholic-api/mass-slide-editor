@@ -573,7 +573,6 @@ function preview_prayer(a, index) {
       preview += lines[i]+"\n";
     }
     preview = preview.trim().replaceAll("\n", "<br/>\n");
-    data.replaceAll("\n", "<br/>\n")
     $("#prayer_preview").html(preview);
     $("#prayer_preview").show();
     $("#prayer_add_button").show();
@@ -611,6 +610,8 @@ function load_prayers() {
   $("#prayerModal").modal("show")
 }
 
+var loaded_hymn = "";
+
 function preview_hymn(a, num) {
   var list = $("#hymn_list").children();
   for(var i=0; i<list.length; i++) {
@@ -624,7 +625,19 @@ function preview_hymn(a, num) {
   $("#hymn_preview").hide();
   $("#hymn_add_button").hide();
   $.get(url, function(data) {
-    $("#hymn_preview").html(data.replaceAll("\n", "<br/>\n"));
+    loaded_hymn = data;
+    var preview = "";
+    var lines = data.split("\n");
+    for(var i=0; i<lines.length; i++) {
+      if(i == 5) {
+        if(lines.length > 5)
+          preview += "...";
+        break;
+      }
+      preview += lines[i]+"\n";
+    }
+    preview = preview.trim().replaceAll("\n", "<br/>\n");
+    $("#hymn_preview").html(preview);
     $("#hymn_preview").show();
     $("#hymn_add_button").show();
   }).fail(function() {
@@ -661,7 +674,7 @@ function add_markdown(md) {
 }
 
 function add_hymn() {
-  var md = $("#hymn_preview").text();
+  var md = loaded_hymn;
   add_markdown(md);
 }
 
