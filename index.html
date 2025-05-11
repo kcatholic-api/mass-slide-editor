@@ -37,10 +37,10 @@
           <a class="nav-link" aria-current="page" href="#tomorrow" id="load_tomorrow">내일</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#saturday" id="load_saturday">이번 토요일</a>
+          <a class="nav-link" aria-current="page" href="#saturday" id="load_saturday">토요일</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#sunday" id="load_sunday">이번 일요일</a>
+          <a class="nav-link" aria-current="page" href="#sunday" id="load_sunday">일요일</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">2025년</a>
@@ -791,7 +791,7 @@ show_menu_title(false);
   const year = (new Date()).getFullYear();
   const mass_indexes_url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/'+year+'/indexes.json';
   const response = await fetch(mass_indexes_url);
-  const indexes = await response.json();
+  var indexes = null;
 
   for(var i=1; i<=12; i++) {
     const month = i;
@@ -800,6 +800,10 @@ show_menu_title(false);
       var m = ''+month;
       if(month < 10)
         m = '0'+month;
+      if (!indexes) {
+        const response = await fetch(mass_indexes_url);
+        indexes = await response.json();
+      }
       for (var i=0; i<indexes.length; i++) {
         var info = indexes[i];
         if(info.filename.startsWith(year+m)) {
