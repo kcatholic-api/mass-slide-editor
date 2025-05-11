@@ -85,10 +85,8 @@
             <li><a class="dropdown-item hymn_menu" href="#">미사곡(93)</a></li>
           </ul>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">기도문 추가</a>
-          <ul class="dropdown-menu" id="prayer_list">
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#" onclick="load_prayers()">기도문 추가</a>
         </li>
       </ul>
       <!--
@@ -216,6 +214,27 @@
       <div class="modal-footer">
         <div id="hymn_preview" class="alert alert-secondary" style="width: 100%" role="alert"></div>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="hymn_add_button" style="display: none" onclick="add_hymn()">추가</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Modal -->
+<div class="modal fade" id="prayerModal" tabindex="-1" aria-labelledby="prayerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="prayerModalLabel">기도문 목록</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="prayer_list">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="prayer_preview" class="alert alert-secondary" style="width: 100%" role="alert"></div>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="prayer_add_button" style="display: none" onclick="add_prayer()">추가</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
       </div>
     </div>
@@ -520,9 +539,79 @@ function cache_save_handler() {
 }
 ace_editor.getSession().on("change", cache_save_handler);
 
+var prayers = ["감사기도", "강복", "거룩하시도다", "니케아콘스탄티노플리스신경", "대영광송", "부속가", "부활삼종기도", "사도신경", "삼종기도-성모송포함", "삼종기도", "성모송", "신앙의신비", "영성체전기도", "예물준비기도", "자비송", "주님의기도", "참회예절", "파견", "평화예식", "하느님의어린양"];
+var loaded_prayer = "";
 
-function load_hymn(a, num) {
-  console.log(list);
+function add_prayer() {
+  var md = loaded_prayer;
+  add_markdown(md);
+}
+
+function preview_prayer(a, index) {
+  var list = $("#prayer_list").children();
+  for(var i=0; i<list.length; i++) {
+    if(list[i] == a)
+      $(list[i]).addClass("active");
+    else
+      $(list[i]).removeClass("active");
+  }
+
+  var prayer_name = prayers[index];
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
+  $("#prayer_preview").hide();
+  $("#prayer_add_button").hide();
+  $.get(url, function(data) {
+    loaded_prayer = data;
+    var preview = "";
+    var lines = data.split("\n");
+    for(var i=0; i<lines.length; i++) {
+      if(i == 5) {
+        if(lines.length > 5)
+          preview += "...";
+        break;
+      }
+      preview += lines[i]+"\n";
+    }
+    preview = preview.trim().replaceAll("\n", "<br/>\n");
+    data.replaceAll("\n", "<br/>\n")
+    $("#prayer_preview").html(preview);
+    $("#prayer_preview").show();
+    $("#prayer_add_button").show();
+  }).fail(function() {
+    console.log("fail")
+    $("#prayer_preview").text("기도문 불러오기에 실패하였습니다.");
+    $("#prayer_preview").hide();
+    $("#prayer_add_button").hide();
+  });
+}
+
+function load_prayers() {
+
+  $("#prayer_list").html("");
+  $("#prayer_preview").hide();
+  $("#prayer_add_button").hide();
+  var count = 0;
+  for(var i=0; i<prayers.length; i++) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action"\
+      onclick="preview_prayer(this, '+i+')">\
+      <div class="d-flex w-100 justify-content-between">\
+          '+prayers[i]+'\
+      </div>\
+    </a>');
+    $("#prayer_list").append(item);
+    count += 1;
+  }
+
+  if(count == 0) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action">\
+      불러 올 자료가 없습니다\
+    </a>');
+    $("#prayer_list").append(item);
+  }
+  $("#prayerModal").modal("show")
+}
+
+function preview_hymn(a, num) {
   var list = $("#hymn_list").children();
   for(var i=0; i<list.length; i++) {
     if(list[i] == a)
@@ -532,6 +621,8 @@ function load_hymn(a, num) {
   }
 
   const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/'+num+'.md';
+  $("#hymn_preview").hide();
+  $("#hymn_add_button").hide();
   $.get(url, function(data) {
     $("#hymn_preview").html(data.replaceAll("\n", "<br/>\n"));
     $("#hymn_preview").show();
@@ -846,26 +937,6 @@ show_menu_title(false);
     $("#notice_div").html(formatDate(t)+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
   }
 
-  /*
-  document.getElementById('load_today').addEventListener('click', async () => {
-    load_marp_md(+new Date());
-  });
-
-  document.getElementById('load_tomorrow').addEventListener('click', async () => {
-    load_marp_md(+new Date() + 86400000);
-  });
-
-  document.getElementById('load_saturday').addEventListener('click', async () => {
-    var n = new Date();
-    load_marp_md(+n+86400000*(6-n.getDay()));
-  });
-
-  document.getElementById('load_sunday').addEventListener('click', async () => {
-    var n = new Date();
-    load_marp_md(+n+86400000*(7-n.getDay()));
-  });
-  */
-
   function listup_month(year, monthly_items) {
     var count = 0;
     $("#month_list").html("");
@@ -898,7 +969,7 @@ show_menu_title(false);
     for(var i=0; i<hymns.length; i++) {
       var info = hymns[i];
       var item = $('<a href="#" class="list-group-item list-group-item-action"\
-        onclick="load_hymn(this, '+info.number+')">\
+        onclick="preview_hymn(this, '+info.number+')">\
         <div class="d-flex w-100 justify-content-between">\
           <span>\
             <b>'+info.number+'</b> \
@@ -1001,29 +1072,6 @@ show_menu_title(false);
       $("#hymnModal").modal("show")
     });
   }
-
-
-  var prayers = ["감사기도", "강복", "거룩하시도다", "니케아콘스탄티노플리스신경", "대영광송", "부속가", "부활삼종기도", "사도신경", "삼종기도-성모송포함", "삼종기도", "성모송", "신앙의신비", "영성체전기도", "예물준비기도", "자비송", "주님의기도", "참회예절", "파견", "평화예식", "하느님의어린양"];
-  for(var i=0; i<prayers.length; i++) {
-    const prayer_name = prayers[i];
-    var item = $('<li><a class="dropdown-item" href="#" id="p_'+i+'">\
-        '+prayers[i]+'</a></li>');
-    $("#prayer_list").append(item);
-
-    document.getElementById('p_'+i).addEventListener('click', async () => {
-      const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
-      $("#notice_div").html('<div class="spinner-border" role="status"></div> 데이타 불러오는 중...').slideDown(500);
-      const response = await fetch(url);
-      var md = await response.text().trim();
-
-      add_markdown(md);
-
-      preview();
-
-      $("#notice_div").html(prayer_name+'을(를) 다음장에 추가 하였습니다.').slideDown(500).delay(1000).slideUp(500);
-    });
-  }
-
 
   const decompress = base64string => {
     try {
