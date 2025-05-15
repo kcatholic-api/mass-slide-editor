@@ -889,7 +889,7 @@ $(document).ready(function() {
 
     const response = await fetch('presentation-template.html');
     const template = await response.text();
-    const stripped_html = html.replace('<div class="marpit">', '');
+    const stripped_html = html.replace('<div class="marpit">', '').replace('</div>', '');
     return template.replace("{{HTML}}", stripped_html)
   }
 
