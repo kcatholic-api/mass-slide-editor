@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="LLM으로 생각보다 은근히 편리한 가톨릭 한국어 미사 슬라이드덱 편집기">
+    <!--<meta name="author" content="">-->
+    <title>LLM으로 생각보다 은근히 편리한 가톨릭 한국어 미사 슬라이드덱 편집기</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.40.0/ace.js" integrity="sha512-fIGectJ0WRU6B2gx99VwpUsCu5T3pqAkPOLE2BJD5wowKmpejvdYg62WvsQ6f3jfOC5EGL0y0ZLcXnnc+oWG9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago@1.6.7/jquery.timeago.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard-js@0.3.6/clipboard.min.js"></script>
+
+
+    <link rel="icon" href="favicon.ico">
+
+  </head>
+  <body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="" id="menu_title">미사 슬라이드덱 편집기</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#today" id="load_today">오늘</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#tomorrow" id="load_tomorrow">내일</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#saturday" id="load_saturday">토요일</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#sunday" id="load_sunday">일요일</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">2025년</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" id="load_1">1월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_2">2월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_3">3월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_4">4월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_5">5월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_6">6월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_7">7월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_8">8월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_9">9월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_10">10월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_11">11월</a></li>
+            <li><a class="dropdown-item" href="#" id="load_12">12월</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">성가 추가</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" id="hymn_0">1번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_1">100번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_2">200번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_3">300번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_4">400번 ~</a></li>
+            <li><a class="dropdown-item" href="#" id="hymn_5">500번 ~</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item hymn_menu" href="#">대림(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성탄(23)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">사순(16)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">부활(15)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성령(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성체(61)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성심(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">봉헌(17)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">참회(9) </a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">위령(12)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성모(52)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">성인(16)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">축가(11)</a></li>
+            <li><a class="dropdown-item hymn_menu" href="#">미사곡(93)</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#" onclick="load_prayers()">기도문 추가</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="" target="_blank">자습서</a>
+          </li>
+        </ul>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- First Modal -->
+<div class="modal fade" id="startupModal" tabindex="-1" aria-labelledby="startupModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="startupModalLabel"><small><i>LLM으로 생각보다 은근히 편한</i></small><br/>가톨릭 한국어 미사 슬라이드덱 편집기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+        평화를 빕니다!
+        </p>
+        <p>
+        이 웹사이트는 전 세계 곳곳에서 미사 슬라이드덱 봉사를 하고 계신 한인 가톨릭 공동체의 형제자매님들께 도움이 되고자 만들어졌습니다.
+        </p>
+        <p>
+        5분 정도 자습서를 따라 해 보시면, 이 LLM을 이용한 대화형 편집기로 <i>생각보다 은근히</i> 쉽게 슬라이드덱을 만들 수 있다는 감이 오실 거예요.
+        </p>
+        <small>
+        이 웹사이트는 <b>데스크톱</b> 브라우저 환경에 최적화되어 있습니다. 혹시! 모바일에서 열어보셨다면 <i>생각보다 은근히</i> 불편하실 수 있으니, 집에 돌아가신 후 컴퓨터로 다시 방문하시길 권해드립니다.
+        <b>PDF 인쇄 기능은 Chrome 브라우저</b>를 사용하시는 것을 추천드립니다.
+        </small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="never_see_startup()">다시 보지 않기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Load Modal -->
+<div class="modal fade" id="loadModal" tabindex="-1" aria-labelledby="loadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="loadModalLabel">로컬 브라우저 저장소 불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <small>어떻게 작동 하나요?</small> <a id="readMore3" data-bs-toggle="collapse" href="#moreText3" aria-expanded="false" aria-controls="moreText3"><small>자세히</small></a></small>
+          <span id="moreText3" class="collapse"><br/><small>편집기로 작성 중인 Markdown 문서에서 Heading 1 (#) 또는 Heading 2 (##) 가 적용된 문자열을 추출해서 문서 제목으로 간주 합니다. 이 제목을 Key로 정하고 웹 표준 기술인 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API" target="_blank">Web Storage API</a>을 이용하여 전체 Markdown 데이타를 사용중인 디바이스의 웹브라우저에 저장하고 불러 옵니다. 따라서 서버에는 그 어떤 정보도 저장되지 않습니다.</small><br/>
+          <small>로컬 브라우저 저장소는 어떤 이유에서건 사라질 수 있습니다. 작성하신 문서는 다운로드 기능을 사용하여 Markdown (확장자.md) 파일로 직접 안전하게 저장해 두시는 것을 권장합니다.</small></span>
+        </p>
+        <div class="list-group" id="saved">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="shareModalLabel">다른 슬라이드덱 봉사자와 편집 내용 공유하기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <small>편집 중인 마크다운 소스를 직접 파일에 저장 또는 Email로 공유 하거나 다음의 주소를 보내어 다른 사람과 편집 내용을 쉽게 공유할 수 있습니다.</small>
+        </p>
+        <p>
+          <small>어떻게 작동 하나요?</small> <a id="readMore2" data-bs-toggle="collapse" href="#moreText2" aria-expanded="false" aria-controls="moreText2"><small>자세히</small></a></small>
+          <span id="moreText2" class="collapse"><br/><small>편집기에 입력된 Markdown 텍스트는 gzip 으로 압축 된 뒤 Base64로 인코딩 되어 현재 웹페이지의 URL에 해시(#) 식별자 형식으로 연결됩니다. 이 긴 URL은 E-mail이나 메신저 등을 통해 공유되며, 전달 받는 측에서 역순으로 해시(#) 식별자 정보를 디코딩 및 압축 해제되어 편집기에 입력되어 작업을 이어갈 수 있습니다.</small><br/>
+          <small>URL이 다소 길순 있지만 뭐 괜찮습니다.</small></span>
+        </p>
+        <div class="card">
+          <h5 class="card-header">URL</h5>
+          <div class="card-body" id="shareURL">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="clipboard.copy($('#shareURL').text().trim());">복사</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="settingsModalLabel">Markdown 에디터 설정</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <input class="form-check-input" type="checkbox" value="" id="vim_mode" onclick="set_keybinding(this.checked)">
+        <label class="form-check-label" for="vim_mode" data-bs-toggle="tooltip" data-bs-placement="top" title="Vim 키 바인딩으로 편집합니다">
+          Vim 키바인딩&nbsp;&nbsp;
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Month Modal -->
+<div class="modal fade" id="monthModal" tabindex="-1" aria-labelledby="monthModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="monthModalLabel">불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="month_list">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hymn Modal -->
+<div class="modal fade" id="hymnModal" tabindex="-1" aria-labelledby="hymnModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="hymnModalLabel">불러오기</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="hymn_list">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="hymn_preview" class="alert alert-secondary" style="width: 100%" role="alert"></div>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="hymn_add_button" style="display: none" onclick="add_hymn()">추가</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Modal -->
+<div class="modal fade" id="prayerModal" tabindex="-1" aria-labelledby="prayerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="prayerModalLabel">기도문 목록</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <div class="list-group" id="prayer_list">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="prayer_preview" class="alert alert-secondary" style="width: 100%" role="alert"></div>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="prayer_add_button" style="display: none" onclick="add_prayer()">추가</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<main class="container-fluid">
+  <div class="row ms-1 me-1">
+    <div id="notice_div" class="alert alert-primary" role="alert" style="display: none"></div>
+    <div id="error_div" class="alert alert-danger" role="alert" style="display: none"></div>
+  </div>
+  <div id="mdrow" class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-8">
+      <ul class="nav nav-tabs" id="rightTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="mdeditor-tab" data-bs-toggle="tab" data-bs-target="#mdeditor" type="button" role="tab" aria-controls="mdeditor" aria-selected="true">Marp/Markdown 에디터</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="preview" aria-selected="false">미리보기</button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade" id="mdeditor" role="tabpanel" aria-labelledby="mdeditor-tab" style="overflow-y: scroll; height: 100%">
+          <table class="editor-toolbar" style="width: 100%">
+            <tr>
+              <td>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick="$('#loadModal').modal('show');update_saved_docs();"><i class="bi bi-folder2-open"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick="save_edit()"><i class="bi bi-floppy2"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Markdown 파일로 다운로드 하기" id="mdDownloadButton"><i class="bi bi-download"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" id="shareButton"><i class="bi bi-box-arrow-up"></i></button>
+              </td>
+              <td style="text-align: right;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="다크/라이트 모드로 토글" onclick="toggle_dark_mode()"><i class="bi bi-circle-half"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="편집기 설정" onclick="$('#settingsModal').modal('show')"><i class="bi bi-gear-wide-connected"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick="clipboard_copy()"><i class="bi bi-copy"></i></button>
+              </td>
+            </tr>
+          </table>
+          <div id="editor" style="height: 100%; width: 100%; border-style: solid; border-color: #eeeeee"></div>
+        </div>
+        <div class="tab-pane fade show active" id="preview" role="tabpanel" aria-labelledby="preview-tab" style="height: 100%">
+          <table class="editor-toolbar" style="width: 100%">
+            <tr>
+              <td>
+                <div class="form-check form-switch" style="display: none">
+                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
+                  <label class="form-check-label" for="flexSwitchCheckChecked" data-bs-toggle="tooltip" data-bs-placement="top" title="왼쪽 편집기와 오른쪽 미리보기의 스크롤을 연결하거나 독립적으로 스크롤 합니다">좌우 스크롤바 고정</label>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 파일로 다운로드 하기" id="htmlDownloadButton"><i class="bi bi-download"></i></button>
+                <button type="button" id="presentationButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="새 브라우저 탭에서 HTML 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
+                <button type="button" id="printButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
+              </td>
+            </tr>
+          </table>
+          <div id="render" style="flex: 1; overflow-y: scroll; height: 100%; border-style: solid; border-color: #eeeeee"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+  <footer style="text-align: center" class="pt-2">
+    <p class="fs-6"><small>평화를 빕니다! <a href="https://kcatholic-api.github.io/" target="_blank">한국어 가톨릭 API 프로젝트</a>를 방문하여 보세요.</small></p>
+  </footer>
+  </body>
+
+<script>
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+console.log("script");
+var ace_editor = ace.edit("editor");
+
+ace_editor.session.setMode("ace/mode/markdown");
+ace_editor.session.setUseWrapMode(true);
+ace_editor.commands.addCommand({
+  name: 'save',
+  bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+  exec: function(editor) {
+  }
+});
+ace_editor.setOptions({
+  fontFamily: "Monospace",
+  fontSize: "11pt"
+});
+
+function set_keybinding(flag) {
+  if(flag) {
+    ace_editor.setKeyboardHandler("ace/keyboard/vim");
+    ace.config.loadModule("ace/keyboard/vim", function(module) {
+      var vimAPI = module.CodeMirror.Vim;
+      vimAPI.defineEx("wirte", "w", function(cm, input) {
+        save_edit()
+      });
+    });
+  } else {
+    ace_editor.setKeyboardHandler("ace/keyboard/vscode");
+  }
+  localStorage.setItem("kcatolic-api-settings", JSON.stringify({vim: flag}));
+}
+
+var editor_settings = localStorage.getItem("kcatolic-api-settings");
+if(editor_settings) {
+  try {
+    editor_settings = JSON.parse(editor_settings);
+    set_keybinding(editor_settings.vim);
+    $("#vim_mode").prop("checked", editor_settings.vim);
+  } catch (e) {
+  }
+}
+
+function set_editor_height() {
+  var guessheight = $(window).height() - $("#mdrow").offset().top - 50;
+  $("#mdrow").css("height", guessheight);
+  console.log();
+  $("#mdeditor").css("height", guessheight - $("#rightTab").height());
+  $("#preview").css("height", guessheight - $("#rightTab").height() - $($(".editor-toolbar")[1]).height());
+}
+
+$(window).on("resize", set_editor_height);
+set_editor_height();
+
+var editor_scroll_top = 0;
+var last_preview_height = 0;
+function r2l(ev) {
+  var top = $("#render").scrollTop();
+  var height = $("#render").prop("scrollHeight");
+  last_preview_height = height;
+  var lineHeight = ace_editor.renderer.lineHeight
+  if(lineHeight == 0)
+    lineHeight = 17;
+  var target_height = ace_editor.session.getScreenLength() * lineHeight;
+  var target_top = top * target_height / height;
+  ace_editor.session.off("changeScrollTop", l2r);
+  ace_editor.session.setScrollTop(target_top);
+  editor_scroll_top = target_top;
+  setTimeout(function() {
+    ace_editor.session.on("changeScrollTop", l2r);
+  }, 100)
+}
+var preview_scroll_top = 0;
+function l2r(ev) {
+  var top = ace_editor.session.$scrollTop;
+  var height = ace_editor.session.getScreenLength() * ace_editor.renderer.lineHeight;
+  var target_height = $("#render").prop("scrollHeight");
+  if(target_height > 0)
+    last_preview_height = target_height;
+  else
+    target_height = last_preview_height;
+  var target_top = top * target_height / height;
+  $("#render").off("scroll", r2l);
+  $("#render").scrollTop(target_top);
+  preview_scroll_top = target_top;
+  setTimeout(function() {
+    $("#render").on("scroll", r2l);
+  }, 100)
+}
+
+function set_link(flag) {
+  if(flag) {
+    $("#render").on("scroll", r2l);
+    ace_editor.session.on("changeScrollTop", l2r);
+  } else {
+    $("#render").off("scroll", r2l);
+    ace_editor.session.off("changeScrollTop", l2r);
+  }
+}
+set_link(true);
+
+function clipboard_copy() {
+  clipboard.copy(ace_editor.getValue());
+  $("#notice_div").html("현재 편집중인 내용을 클립보드에 복사 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+}
+
+function suggested_title() {
+  var title = "제목 없음";
+  lines = ace_editor.getValue().split("\n");
+  dash_count = 0;
+  for(var i=0; i<lines.length; i++) {
+    var l = lines[i].trim();
+    if(l == "---")
+      dash_count += 1;
+    else if(dash_count >= 2 && (l.startsWith("# ") || l.startsWith("## "))) {
+      title = l.slice(2).trim();
+      var p = title.search("<!--");
+      if(p>0)
+        title = title.slice(0, p).trim();
+      break;
+    }
+  }
+  return title;
+}
+
+function save_edit() {
+  var title = suggested_title();
+
+  $("#notice_div").html('"'+title+'"'+"<br/>이(가) 로컬 브라우저 저장소에 저장되었습니다").slideDown(500).delay(1000).slideUp(500);
+  localStorage.setItem("kcatolic-api."+title, JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
+
+  update_saved_docs(title);
+}
+
+function restore_edit(index) {
+  ace_editor.getSession().off("change", cache_save_handler);
+
+  // load cache
+  for(var i=0; i<localStorage.length; i++) {
+    if(index == i) {
+      var title = localStorage.key(i).replace("kcatolic-api.", "");
+      var cache = JSON.parse(localStorage.getItem(localStorage.key(i)));
+      ace_editor.setValue(cache.content, -1);
+      ace_editor.session.setScrollTop(0);
+      update_saved_docs(localStorage.key(i));
+      $("#notice_div").html("로컬 브라우저 저장소에서 \""+title+"\"을(를) 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      break;
+    }
+  }
+
+  ace_editor.getSession().on("change", cache_save_handler);
+  $("#loadModal").modal("hide");
+}
+
+function restore_cache() {
+  ace_editor.getSession().off("change", cache_save_handler);
+
+  // load cache
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(name == "kcatolic-api.cache") {
+      var cache = JSON.parse(localStorage.getItem(name));
+      ace_editor.setValue(cache.content, -1);
+      ace_editor.session.setScrollTop(0);
+      $("#notice_div").html("로컬 브라우저 저장소에서 임시 저장 되었던 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      break;
+    }
+  }
+
+  ace_editor.getSession().on("change", cache_save_handler);
+  $("#loadModal").modal("hide");
+}
+
+function update_saved_docs(highlight) {
+  $("#saved").html("");
+
+  var count = 0;
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(name == "kcatolic-api.cache") {
+      var cache = {date: new Date, content: ""};
+      try {
+        cache = JSON.parse(localStorage.getItem("kcatolic-api.cache"));
+      } catch (e) {
+        continue;
+      }
+      var item = $('<a href="#" class="list-group-item list-group-item-action" onclick="restore_cache()">\
+        <div class="d-flex w-100 justify-content-between">\
+          <strong>[저장 하지 않은 내용 복원]</strong>\
+          <small> \
+            <time class="timeago" datetime="'+cache.date+'"></time> \
+            <i class="bi bi-trash" onclick="localStorage.removeItem(localStorage.key('+i+')); update_saved_docs()"></i> \
+          </small> \
+        </div>\
+      </a>');
+      $("#saved").append(item);
+      count += 1;
+      break;
+    }
+  }
+
+  // load saved slides
+  for(var i=0; i<localStorage.length; i++) {
+    var name = localStorage.key(i);
+    if(!name.startsWith("kcatolic-api."))
+      continue;
+    if(name == "kcatolic-api.cache")
+      continue;
+    var content = {date: new Date, content: ""};
+    try {
+      content = JSON.parse(localStorage.getItem(localStorage.key(i)));
+    } catch (e) {
+      continue;
+    }
+    var active = "";
+    //if(name == highlight)
+    //  active = " active";
+    var item = $('<a href="#" class="list-group-item list-group-item-action'+active+'" onclick="restore_edit('+i+')">\
+      <div class="d-flex w-100 justify-content-between">\
+        '+name.replace("kcatolic-api.", "")+'\
+        <small> \
+          <time class="timeago" datetime="'+content.date+'"></time> \
+          <i class="bi bi-trash" onclick="localStorage.removeItem(localStorage.key('+i+')); update_saved_docs()"></i> \
+        </small> \
+      </div>\
+    </a>');
+    $("#saved").append(item);
+    count += 1;
+  }
+
+  if(count == 0) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action">\
+      브라우저 로컬 저장소가 비었습니다.\
+    </a>');
+    $("#saved").append(item);
+  }
+  $("time.timeago").timeago();
+}
+
+function cache_save_handler() {
+  console.log("cache save");
+  localStorage.setItem("kcatolic-api.cache", JSON.stringify({date: new Date(), content: ace_editor.getValue()}));
+}
+ace_editor.getSession().on("change", cache_save_handler);
+
+var prayers = ["감사기도", "강복", "거룩하시도다", "니케아콘스탄티노플리스신경", "대영광송", "부속가", "부활삼종기도", "사도신경", "삼종기도-성모송포함", "삼종기도", "성모송", "신앙의신비", "영성체전기도", "예물준비기도", "자비송", "주님의기도", "참회예절", "파견", "평화예식", "하느님의어린양"];
+var loaded_prayer = "";
+
+function add_prayer() {
+  var md = loaded_prayer;
+  add_markdown(md);
+}
+
+function preview_prayer(a, index) {
+  var list = $("#prayer_list").children();
+  for(var i=0; i<list.length; i++) {
+    if(list[i] == a)
+      $(list[i]).addClass("active");
+    else
+      $(list[i]).removeClass("active");
+  }
+
+  var prayer_name = prayers[index];
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+prayer_name+'.md';
+  $("#prayer_preview").hide();
+  $("#prayer_add_button").hide();
+  $.get(url, function(data) {
+    loaded_prayer = data;
+    var preview = "";
+    var lines = data.split("\n");
+    for(var i=0; i<lines.length; i++) {
+      if(i == 5) {
+        if(lines.length > 5)
+          preview += "...";
+        break;
+      }
+      preview += lines[i]+"\n";
+    }
+    preview = preview.trim().replaceAll("\n", "<br/>\n");
+    $("#prayer_preview").html(preview);
+    $("#prayer_preview").show();
+    $("#prayer_add_button").show();
+  }).fail(function() {
+    console.log("fail")
+    $("#prayer_preview").text("기도문 불러오기에 실패하였습니다.");
+    $("#prayer_preview").hide();
+    $("#prayer_add_button").hide();
+  });
+}
+
+function load_prayers() {
+
+  $("#prayer_list").html("");
+  $("#prayer_preview").hide();
+  $("#prayer_add_button").hide();
+  var count = 0;
+  for(var i=0; i<prayers.length; i++) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action"\
+      onclick="preview_prayer(this, '+i+')">\
+      <div class="d-flex w-100 justify-content-between">\
+          '+prayers[i]+'\
+      </div>\
+    </a>');
+    $("#prayer_list").append(item);
+    count += 1;
+  }
+
+  if(count == 0) {
+    var item = $('<a href="#" class="list-group-item list-group-item-action">\
+      불러 올 자료가 없습니다\
+    </a>');
+    $("#prayer_list").append(item);
+  }
+  $("#prayerModal").modal("show")
+}
+
+var loaded_hymn = "";
+
+function preview_hymn(a, num) {
+  var list = $("#hymn_list").children();
+  for(var i=0; i<list.length; i++) {
+    if(list[i] == a)
+      $(list[i]).addClass("active");
+    else
+      $(list[i]).removeClass("active");
+  }
+
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/'+num+'.md';
+  $("#hymn_preview").hide();
+  $("#hymn_add_button").hide();
+  $.get(url, function(data) {
+    loaded_hymn = data;
+    var preview = "";
+    var lines = data.split("\n");
+    for(var i=0; i<lines.length; i++) {
+      if(i == 5) {
+        if(lines.length > 5)
+          preview += "...";
+        break;
+      }
+      preview += lines[i]+"\n";
+    }
+    preview = preview.trim().replaceAll("\n", "<br/>\n");
+    $("#hymn_preview").html(preview);
+    $("#hymn_preview").show();
+    $("#hymn_add_button").show();
+  }).fail(function() {
+    console.log("fail")
+    $("#hymn_preview").text("성가 불러오기에 실패하였습니다.");
+    $("#hymn_preview").hide();
+    $("#hymn_add_button").hide();
+  });
+}
+
+function add_markdown(md) {
+    var pos = ace_editor.getCursorPosition();
+    var ready = false;
+    var done = false;
+    var lines = ace_editor.getValue().split("\n");
+    var dash_count = 0;
+    for(var i=0; i<lines.length; i++) {
+      if(pos.row == i)
+        ready = true;
+      var l = lines[i].trim();
+      if(l=="---")
+        dash_count += 1;
+
+      if(dash_count > 2 && l=="---" && ready && !done) {
+        ace_editor.gotoLine(i, 0);
+        ace_editor.insert("\n---\n\n"+md.trim()+"\n\n");
+        done = true;
+      }
+    }
+    if (!done) {
+      ace_editor.gotoLine(lines.length+1, 0);
+      ace_editor.insert("\n\n---\n\n"+md.trim());
+    }
+}
+
+function add_hymn() {
+  var md = loaded_hymn;
+  add_markdown(md);
+}
+
+
+$("#readMore").on("click", function() {
+  var $this = $(this);
+  $("#dotdotdot").text($("#dotdotdot").text() == ""?"...":"")
+  $this.text($this.text() == '더 보기' ? '간략히' : '더 보기');
+  set_editor_height();
+});
+
+function toggle_dark_mode() {
+  lines = ace_editor.getValue().split("\n");
+  dash_count = 0;
+  var currentMode = "unknown";
+  var nextMode = "unknown";
+  var bgImageLine = "";
+  for(var i=0; i<lines.length; i++) {
+    var l = lines[i].trim();
+    if(l == "---")
+      dash_count += 1;
+    else if(dash_count < 2) {
+      var tokens = l.split(":", 2);
+      if(tokens.length == 2) {
+        var key = tokens[0].trim().replace(" ", "");
+        var value = tokens[1].trim();
+
+        if(key == "backgroundColor" && value == "#000000") {
+          currentMode = "black";
+        } else if(key == "backgroundColor" && value == "#ffffff") {
+          currentMode = "white";
+        } else if(key == "backgroundImage") {
+          currentMode = "bgimage";
+          bgImageLine = "#"+l;
+        } else if(key == "#backgroundImage") {
+          bgImageLine = l;
+        }
+      }
+    } else
+      break;
+  }
+
+  if(currentMode == "black") {
+    nextMode = "white";
+  } else if(currentMode == "white") {
+    nextMode = "black";
+  } else if(currentMode == "bgimage") {
+    nextMode = "black";
+  } else {
+    nextMode = "black";
+  }
+
+  new_code = ""
+  dash_count = 0;
+  for(var i=0; i<lines.length; i++) {
+    var l = lines[i].trim();
+    if(l == "---") {
+      dash_count += 1;
+      if(dash_count == 2) {
+        if(nextMode == "white") {
+          new_code += "color: #000000\n";
+          new_code += "backgroundColor: #ffffff\n";
+        } else if(nextMode == "black") {
+          new_code += "color: #ffffff\n";
+          new_code += "backgroundColor: #000000\n";
+        }
+        if(bgImageLine != "")
+          new_code += bgImageLine+"\n";
+      }
+      new_code += "---\n";
+    } else if(dash_count < 2) {
+      var tokens = l.split(":", 2);
+      if(tokens.length == 2) {
+        var key = tokens[0].trim().replace(" ", "");
+        var value = tokens[1].trim();
+        if (key == "backgroundImage" || key == "#backgroundImage")
+          continue;
+        if (key == "backgroundColor" || key == "#backgroundColor")
+          continue;
+        if (key == "color" || key == "#color")
+          continue;
+      }
+      new_code += lines[i]+"\n";
+    } else
+      new_code += lines[i]+"\n";
+  }
+
+  // XXX hard code for abudhabi community
+  var logo_url = "https://kcatholic-api.github.io/abudhabi/logo.svg";
+  var dark_logo_url = "https://kcatholic-api.github.io/abudhabi/logo-dark.svg";
+  if(nextMode == "black") {
+    new_code = new_code.replace(logo_url, dark_logo_url);
+  } else if(nextMode == "white") {
+    new_code = new_code.replace(dark_logo_url, logo_url);
+  }
+  ace_editor.setValue(new_code, -1);
+  ace_editor.session.setScrollTop(0);
+
+}
+
+function load_marp_md_by_file(year, filename) {
+  var url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/2025/'+filename;
+  $.get(url, function(data) {
+    ace_editor.setValue(data, -1);
+    ace_editor.session.setScrollTop(0);
+    $("#notice_div").html(filename.replace(".md", "")+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+  }).fail(function() {
+    $("#error_div").html("데이타를 불러오는데 실패하였습니다.").slideDown(500).delay(1000).slideUp(500);
+  });
+  $("#monthModal").modal("hide");
+}
+function show_catch_phrase() {
+  $("#menu_title").text("LLM으로 은근히 편리한").fadeIn(500).delay(5000).fadeOut(500, show_menu_title);
+}
+function show_menu_title(fade=true) {
+  if(fade)
+    $("#menu_title").text("미사 슬라이드덱 편집기").fadeIn(500).delay(25000).fadeOut(500, show_catch_phrase);
+  else
+    $("#menu_title").text("미사 슬라이드덱 편집기").delay(25000).fadeOut(500, show_catch_phrase);
+}
+
+var startup_dialog_version = "kcatolic-api-startup-message-v1";
+function never_see_startup() {
+  localStorage.setItem(startup_dialog_version, "no");
+}
+
+$(document).ready(function() {
+  show_menu_title(false);
+
+  if(window.location.hash == "") {
+    if(localStorage.getItem(startup_dialog_version) != "no") {
+      console.log("show startup");
+      $("#startupModal").modal("show");
+    }
+  }
+
+  var button1 = document.querySelector('#mdeditor-tab');
+  button1.addEventListener('shown.bs.tab', function (event) {
+    ace_editor.session.setScrollTop(editor_scroll_top);
+    ace_editor.resize();
+  })
+  var button2 = document.querySelector('#preview-tab');
+  button2.addEventListener('shown.bs.tab', function (event) {
+    $("#render").scrollTop(preview_scroll_top);
+  })
+
+});
+
+</script>
+
+<script type="module">
+  import { Marp } from 'https://esm.sh/@marp-team/marp-core?bundle'
+  import browser from 'https://esm.sh/@marp-team/marp-core/browser'
+  const marp = new Marp({ script: false })
+  console.log("module");
+
+  function preview() {
+    const { html, css } = marp.render(ace_editor.getValue().trim());
+    render.innerHTML = `${html}<style>${css}</style>`;
+    //browser(render);
+  }
+
+  editor.addEventListener('input', () => {
+    preview();
+  });
+
+  async function download_file(title, suffix, mime, data) {
+    if( window.showSaveFilePicker ) {
+      const opts = {
+        suggestedName: title+"."+suffix,
+      };
+      const handle = await window.showSaveFilePicker(opts);
+      const writable = await handle.createWritable();
+      await writable.write(data);
+      writable.close();
+    } else {
+      var blob = new Blob([ data ],
+	{ type : mime+";charset=utf-8" } )
+
+      const saveFile = document.createElement( "a" );
+      saveFile.href = URL.createObjectURL(blob);
+      saveFile.download = title+"."+suffix;
+      saveFile.click();
+      setTimeout(() => URL.revokeObjectURL( saveFile.href ), 60000 );
+    }
+  }
+
+  document.getElementById('mdDownloadButton').addEventListener('click', async () => {
+    download_file(suggested_title(), "md", "text/markdown", ace_editor.getValue().trim())
+  });
+
+  async function render_presentation_html() {
+    const mdContent = ace_editor.getValue().trim();
+    const { html, css } = marp.render(mdContent);
+
+    const response = await fetch('presentation-template.html');
+    const template = await response.text();
+    const stripped_html = html.replace('<div class="marpit">', '').replace('</div>', '');
+    return template.replace("{{HTML}}", stripped_html)
+  }
+
+  document.getElementById('htmlDownloadButton').addEventListener('click', async () => {
+    const rendered = await render_presentation_html();
+    download_file(suggested_title(), "html", "text/html", rendered)
+  });
+
+
+  document.getElementById('presentationButton').addEventListener('click', async () => {
+    const rendered = await render_presentation_html();
+    localStorage.setItem("kcatolic-api.presentation", rendered);
+
+    const slideWindow = window.open('presentation.html', '_blank');
+    if(!slideWindow) {
+      $("#error_div").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+    }
+    //browser(slideWindow.document.body);
+  });
+
+  document.getElementById('printButton').addEventListener('click', () => {
+    const mdContent = ace_editor.getValue().trim();
+    const { html, css } = marp.render(mdContent);
+    const slideWindow = window.open('', '_blank');
+    if(!slideWindow) {
+      $("#error_div").html("새창 열기에 실패 하였습니다. 웹브라우저에 차단된 윈도우와 관련된 에러가 있었는지 확인하세요.").slideDown(500).delay(1000).slideUp(500);
+    }
+    slideWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="ko">
+      <head>
+        <meta charset="UTF-8">
+        <style>${css}</style>
+      </head>
+      <body>${html}</body>
+      </html>
+    `);
+    slideWindow.print();
+    slideWindow.close();
+  });
+
+  preview();
+
+  ace_editor.getSession().on("change", preview);
+
+  document.getElementById('shareButton').addEventListener('click', async () => {
+    var data = ace_editor.getValue()
+
+    let stream = new Blob([data], {
+          type: 'text/plain',
+    }).stream();
+
+    const compressedReadableStream = stream.pipeThrough(
+        new CompressionStream("gzip")
+    );
+    const compressedResponse = await new Response(compressedReadableStream);
+    const blob = await compressedResponse.blob();
+
+    const buffer = await blob.arrayBuffer();
+
+    const compressedBase64 = btoa(
+      String.fromCharCode(
+        ...new Uint8Array(buffer)
+      )
+    );
+
+    var url = window.location.toString();
+    var hash_pos = url.search('#');
+    if(hash_pos > 0) {
+      url = url.slice(0, hash_pos);
+    }
+    url = url + "#"+compressedBase64;
+
+    $("#shareURL").text(url);
+    $("#shareModal").modal("show");
+  });
+
+  function formatDate(inputDate) {
+    const dateObj = new Date(inputDate);
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+
+    const formattedDateArray = new Intl.DateTimeFormat('en-CA', options).formatToParts(dateObj);
+    const year = formattedDateArray.find(entry => entry.type === 'year').value;
+    const month = formattedDateArray.find(entry => entry.type === 'month').value.padStart(2, '0');
+    const day = formattedDateArray.find(entry => entry.type === 'day').value.padStart(2, '0');
+
+    return `${year}${month}${day}`;
+  }
+
+  async function load_marp_md(ts) {
+    const year = (new Date()).getFullYear();
+    if(year != 2025) {
+      $("#error_div").html("2025년에만 사용할 수 있는 기능입니다.").slideDown(500).delay(1000).slideUp(500);
+      return;
+    }
+    var t = new Date(ts);
+    const md = formatDate(t) + ".md";
+    const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/'+t.getFullYear()+'/'+md;
+    const response = await fetch(url);
+    ace_editor.setValue(await response.text(), -1);
+    ace_editor.session.setScrollTop(0);
+    $("#notice_div").html(formatDate(t)+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+  }
+
+  function listup_month(year, monthly_items) {
+    var count = 0;
+    $("#month_list").html("");
+    for(var i=0; i<monthly_items.length; i++) {
+      var info = monthly_items[i];
+      var item = $('<a href="#'+info.filename.replace(".md", "")+'" class="list-group-item list-group-item-action">\
+        <div class="d-flex w-100 justify-content-between">\
+          '+info.date.slice(6)+'일\
+          ('+info.day+') - \
+          '+info.title+'\
+        </div>\
+      </a>');
+      $("#month_list").append(item);
+      count += 1;
+    }
+
+    if(count == 0) {
+      var item = $('<a href="#" class="list-group-item list-group-item-action">\
+        불러 올 자료가 없습니다\
+      </a>');
+      $("#month_list").append(item);
+    }
+  }
+
+  function load_hymnlist(hymns) {
+    var count = 0;
+    $("#hymn_list").html("");
+    $("#hymn_preview").hide();
+    $("#hymn_add_button").hide();
+    for(var i=0; i<hymns.length; i++) {
+      var info = hymns[i];
+      var item = $('<a href="#" class="list-group-item list-group-item-action"\
+        onclick="preview_hymn(this, '+info.number+')">\
+        <div class="d-flex w-100 justify-content-between">\
+          <span>\
+            <b>'+info.number+'</b> \
+            '+info.title+'\
+          </span>\
+          <small> \
+            '+info.made_for+'\
+          </small> \
+        </div>\
+      </a>');
+      $("#hymn_list").append(item);
+      count += 1;
+    }
+
+    if(count == 0) {
+      var item = $('<a href="#" class="list-group-item list-group-item-action">\
+        불러 올 자료가 없습니다\
+      </a>');
+      $("#hymn_list").append(item);
+    }
+  }
+
+  const year = (new Date()).getFullYear();
+  const mass_indexes_url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/'+year+'/indexes.json';
+  var mass_indexes = null;
+
+  for(var i=1; i<=12; i++) {
+    const month = i;
+    document.getElementById('load_'+month).addEventListener('click', async () => {
+      var monthly_items = [];
+      var m = ''+month;
+      if(month < 10)
+        m = '0'+month;
+      if (!mass_indexes) {
+        const response = await fetch(mass_indexes_url);
+        mass_indexes = await response.json();
+      }
+      for (var i=0; i<mass_indexes.length; i++) {
+        var info = mass_indexes[i];
+        if(info.filename.startsWith(year+m)) {
+          monthly_items.push(info);
+        }
+      }
+      listup_month(year, monthly_items);
+
+      $("#monthModalLabel").text(""+month+"월 미사 목록");
+      $("#monthModal").modal("show")
+    });
+  }
+
+  const hymn_indexes_url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/index.json';
+  var hymn_indexes = null;
+  for(var i=0; i<=5; i++) {
+    const numrange = i;
+    document.getElementById('hymn_'+numrange).addEventListener('click', async () => {
+      if (!hymn_indexes) {
+        console.log("hymn 다운로드");
+        const response = await fetch(hymn_indexes_url);
+        hymn_indexes = await response.json();
+      }
+
+      var hymns = [];
+      var from_number = numrange*100 + 1;
+      var to_number = numrange*100+100;
+      for(var i=from_number; i<to_number; i++) {
+        if(i in hymn_indexes.by_number) {
+          var info = hymn_indexes.by_number[i];
+          var title = info[0];
+          var made_for = info[1];
+          hymns.push({"number": i, "title":  title, "made_for": made_for});
+        }
+      }
+
+      load_hymnlist(hymns);
+
+      $("#hymnModalLabel").text("성가 "+from_number+"번 부터 "+to_number+"까지");
+      $("#hymnModal").modal("show")
+    });
+  }
+  const hymn_menus = document.getElementsByClassName("hymn_menu");
+  for(var i=0; i<hymn_menus.length; i++) {
+    const made_for = hymn_menus[i].innerText.split("(")[0];
+    hymn_menus[i].addEventListener('click', async () => {
+      if (!hymn_indexes) {
+        const response = await fetch(hymn_indexes_url);
+        hymn_indexes = await response.json();
+      }
+
+      var hymns = [];
+      for(var j=0; j<hymn_indexes.made_for[made_for].length; j++) {
+        var num = hymn_indexes.made_for[made_for][j];
+        var info = hymn_indexes.by_number[num];
+        var title = info[0];
+        hymns.push({"number": num, "title":  title, "made_for": ""});
+      }
+
+      load_hymnlist(hymns);
+
+      $("#hymnModalLabel").text(made_for);
+      $("#hymnModal").modal("show")
+    });
+  }
+
+  const decompress = base64string => {
+    try {
+      const bytes = Uint8Array.from(atob(base64string), c => c.charCodeAt(0));
+      const cs = new DecompressionStream('gzip');
+      const writer = cs.writable.getWriter();
+      writer.write(bytes);
+      writer.close();
+      return new Response(cs.readable).arrayBuffer().then(function (arrayBuffer) {
+          return new TextDecoder().decode(arrayBuffer);
+      });
+    } catch (e) {
+      $("#error_div").html("뭔가 잘못되었습니다. ChatGPT에서 받은 링크로 들어 오셨다면, 한번 혼내주시고 제대로 된 링크를 만들어 달라고 해보세요.").slideDown(500).delay(5000).slideUp(500);
+      return;
+    }
+  }
+
+  async function load_from_hash() {
+    const hashstring = window.location.hash.slice(1);
+    var n = new Date();
+    if(hashstring == "today") {
+      load_marp_md(+new Date());
+      return;
+    } else if(hashstring == "tomorrow") {
+      load_marp_md(+new Date() + 86400000);
+      return;
+    } else if(hashstring == "saturday") {
+      load_marp_md(+n+86400000*(6-n.getDay()));
+      return;
+    } else if(hashstring == "sunday") {
+      load_marp_md(+n+86400000*(7-n.getDay()));
+      return;
+    } else if(hashstring.startsWith("2025") && hashstring.length<=10) {
+      $("#notice_div").html('<div class="spinner-border" role="status"></div> 데이타 불러오는 중...').slideDown(500);
+      var url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/templates/2025/'+hashstring+'.md';
+      const response = await fetch(url);
+      ace_editor.setValue(await response.text(), -1);
+      ace_editor.session.setScrollTop(0);
+      $("#notice_div").html(hashstring+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      $("#monthModal").modal("hide");
+      return;
+    }
+    const b64str = hashstring;
+    decompress(b64str).then(function(str) {
+      ace_editor.setValue(str.trim(), -1);
+      ace_editor.session.setScrollTop(0);
+      $("#notice_div").html("공유링크에서 Markdown 문서를 추출하여 로드하였습니다.").slideDown(500).delay(1000).slideUp(500);
+      preview();
+    });
+  }
+  window.addEventListener('hashchange', () => {
+    load_from_hash();
+  });
+
+  if(window.location.hash != '') {
+    load_from_hash();
+  } else {
+    $("#notice_div").html('<div class="spinner-border" role="status"></div> 자습서 Markdown 문서 불러오는 중...').slideDown(500);
+    const response = await fetch('tutorial.md');
+    ace_editor.setValue(await response.text(), -1);
+    ace_editor.session.setScrollTop(0);
+    $("#notice_div").html("자습서 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+  }
+</script>
+</html>
