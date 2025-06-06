@@ -295,7 +295,7 @@
           <button class="nav-link active" id="ollama-tab" data-bs-toggle="tab" data-bs-target="#ollama" type="button" role="tab" aria-controls="ollama" aria-selected="false"><img src="https://ollama.com/public/ollama.png" style="height: 30px; margin-top: -8px"> 로컬 Ollama와 대화 하기</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="mdeditor-tab" data-bs-toggle="tab" data-bs-target="#mdeditor" type="button" role="tab" aria-controls="mdeditor" aria-selected="true">Marp/Markdown 에디터</button>
+          <button class="nav-link" id="mdeditor-tab" data-bs-toggle="tab" data-bs-target="#mdeditor" type="button" role="tab" aria-controls="mdeditor" aria-selected="true">편집기</button>
         </li>
       </ul>
       <div class="tab-content" id="tabContent">
@@ -941,15 +941,21 @@ async function initialize_prompt_for_tutorial() {
       <div id="right_spacer"></div>
       <table class="editor-toolbar" style="width: 100%">
         <tr>
-          <td style="width: 70px">
+          <td>
+            <table>
+              <tr>
+                <td>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="1:2로 좌우 분할" id="button_split_1and2" onclick="split_1and2()"><i class="bi bi-layout-sidebar"></i></button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="1:1로 좌우 분할" id="button_split_1and1" onclick="split_1and1()"><i class="bi bi-layout-split"></i></button>
-          </td>
-          <td>
+                </td>
+                <td>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
               <label class="form-check-label" for="flexSwitchCheckChecked" data-bs-toggle="tooltip" data-bs-placement="top" title="왼쪽 편집기와 오른쪽 미리보기의 스크롤을 연결하거나 독립적으로 스크롤 합니다">좌우 스크롤바 고정</label>
             </div>
+                </td>
+              </tr>
+            </table>
           </td>
           <td style="text-align: right;">
             <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 파일로 다운로드 하기" id="htmlDownloadButton"><i class="bi bi-download"></i></button>
