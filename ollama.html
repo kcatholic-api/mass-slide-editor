@@ -371,10 +371,10 @@
         <div class="tab-pane fade show active" role="tabpanel" id="ollama" aria-labelledby="ollama-tab" style="overflow-y: scroll; height: 100%">
           <table style="width: 100%" class="mt-2">
             <tr>
-              <td style="width: 120px">
-                LLM 모델 선택: 
+              <td style="width: 25%">
+                LLM 모델:
               </td>
-              <td>
+              <td style="width: 75%">
                 <select id="model-select" class="form-select" aria-label="모델 선택"></select>
               </td>
             </tr>
@@ -511,7 +511,7 @@ updates the query parameters of page url to include model name
 */
 // Fetch available models and populate the dropdown
 async function populateModels() {
-  document.getElementById('send-button').addEventListener('click', submitRequest);
+  document.getElementById('send-button').addEventListener('click', () => { submitRequest() });
 
   try {
     const data = await getModels();
@@ -519,7 +519,11 @@ async function populateModels() {
     const selectElement = document.getElementById('model-select');
     selectElement.options.length = 0;
     selectElement.onchange = (() => {
+      document.getElementById('chat-history').context = null;
       localStorage.setItem("kcatolic-api-ollama.model", selectElement.value);
+      if(very_first_time_prompt != "") {
+        submitRequest(very_first_time_prompt);
+      }
     });
     const lastChosenModel = localStorage.getItem("kcatolic-api-ollama.model");
 
@@ -542,6 +546,10 @@ async function populateModels() {
     + faqString));
     let modal = new bootstrap.Modal(document.getElementById('errorModal'));
     modal.show();
+  }
+
+  if(very_first_time_prompt != "") {
+    submitRequest(very_first_time_prompt);
   }
 }
 
@@ -618,20 +626,31 @@ function removeBetween(arr, startVal, endVal) {
   return arr;
 }
 
+var very_first_time_prompt = "";
 // Function to handle the user input and call the API functions
-async function submitRequest() {
-  const input = document.getElementById('user-input').value;
+async function submitRequest(promptString) {
+  var input = document.getElementById('user-input').value.trim();
+  var display_input = document.getElementById('user-input').value.trim();
   const selectedModel = getSelectedModel();
   const context = document.getElementById('chat-history').context;
   const systemPrompt = "";
-  const data = { model: selectedModel, prompt: input, context: removeBetween(context, 151648, 151649), system: systemPrompt };
+
+  if(promptString && promptString.trim() != "") {
+    input = promptString.trim();
+    display_input = "평화를 빕니다~!";
+  }
+
+  if(input == "")
+    return;
+
+  const data = { model: selectedModel, prompt: input, context: removeBetween(context, 151648, 151649), system: systemPrompt, think: false};
   $("#send-button").prop("disabled", true);
 
   // Create user message element and append to chat history
   let chatHistory = document.getElementById('chat-history');
   let userMessageDiv = document.createElement('div');
   userMessageDiv.className = 'mb-2 user-message';
-  userMessageDiv.innerText = input;
+  userMessageDiv.innerText = display_input;
   chatHistory.appendChild(userMessageDiv);
   $("#scroll-wrapper").scrollTop($("#scroll-wrapper").prop("scrollHeight"));
 
@@ -668,6 +687,7 @@ async function submitRequest() {
         let word = parsedResponse.response;
         if (parsedResponse.done) {
           chatHistory.context = parsedResponse.context;
+          /*
           // Copy button
           let copyButton = document.createElement('button');
           copyButton.className = 'btn btn-secondary copy-button';
@@ -680,6 +700,97 @@ async function submitRequest() {
             });
           };
           responseDiv.appendChild(copyButton);
+          */
+
+          // action handler
+          const regex = /<!--\s*ACTION:([a-zA-Z0-9]+)\(([\s\S]*?)\)\s*-->/gs;
+
+          let match;
+          var action = "";
+          var param = "";
+
+          while ((match = regex.exec(responseDiv.hidden_text)) !== null) {
+            action = match[1];
+            param = match[2];
+            break;
+          }
+
+          console.log(action, '(', param, ')');
+
+          if(action != "" && param != "") {
+            let actionButton = null;
+            if (action == "addHymn") {
+              var num = parseInt(param);
+              if(num >= 1 && num <= 528) {
+                actionButton = document.createElement('button');
+                actionButton.innerHTML = num+"번 성가 추가";
+                actionButton.onclick = () => {
+                  add_hymn_by_number(param.trim());
+                  actionButton.disabled = true;
+                };
+              }
+            } else if (action == "addPrayer") {
+              var supported = false;
+              for(var i=0; i<prayers.length; i++) {
+                if(prayers[i] == param.trim()) {
+                  supported = true;
+                  break;
+                }
+              }
+              if(supported) {
+                actionButton = document.createElement('button');
+                actionButton.innerHTML = param.trim()+" 추가";
+                actionButton.onclick = () => {
+                  add_prayer_by_name(param.trim());
+                  actionButton.disabled = true;
+                };
+              }
+            } else if (action == "useTemplate") {
+              function isValidDateFormat(str) {
+                const regex = /^\d{4}\d{2}\d{2}$/;
+                return regex.test(str);
+              }
+              if(isValidDateFormat(param.trim())) {
+                actionButton = document.createElement('button');
+                actionButton.innerHTML = param+" 템플릿 사용 (페이지 다시 로드 됨)";
+                actionButton.onclick = () => {
+                  window.location = window.location.origin + window.location.pathname + '#'+param.trim();
+                  actionButton.disabled = true;
+                };
+              }
+            } else if (action == "addPage") {
+              actionButton = document.createElement('button');
+              actionButton.innerHTML = "페이지 추가";
+              actionButton.onclick = () => {
+                var md = param.trim();
+                if(md.startsWith('"'))
+                  md = md.slice(1);
+                if(md.startsWith("'"))
+                  md = md.slice(1);
+                if(md.startsWith("```"))
+                  md = md.slice(3);
+                if(md.startsWith("markdown"))
+                  md = md.slice(8);
+                if(md.endsWith('"'))
+                  md = md.slice(0, md.length-1);
+                if(md.endsWith("'"))
+                  md = md.slice(0, md.length-1);
+                if(md.endsWith("```"))
+                  md = md.slice(0, md.length-3);
+                if(md.startsWith("---"))
+                  md = md.slice(3);
+                if(md.endsWith("---"))
+                  md = md.slice(0, md.length-3);
+                add_markdown(md.replaceAll("\\n", "\n"));
+                actionButton.disabled = true;
+              };
+            }
+            if(actionButton) {
+              actionButton.className = 'btn btn-secondary';
+              responseDiv.appendChild(actionButton);
+            }
+          }
+
         }
         // add word to response
         if (word != undefined && word != "") {
@@ -688,7 +799,25 @@ async function submitRequest() {
           }
           word = word.replace(/<think>/g, '<details open><summary>think content</summary><br><span style="color:gray;">').replace(/<\/think>/g, '</span><hr></details>');
           responseDiv.hidden_text += word;
-          responseDiv.innerHTML = DOMPurify.sanitize(marked.parse(responseDiv.hidden_text)); // Append word to response container
+          var hidden_text = responseDiv.hidden_text;
+          var comment_start = hidden_text.search("<!--");
+          var comment_end = hidden_text.search("-->");
+          if(comment_start >= 0 && comment_end < 0) {
+            hidden_text = responseDiv.hidden_text.slice(0, comment_start);
+            var nextLines = responseDiv.hidden_text.slice(comment_start).split("\n");
+            for(var i=0; i<nextLines.length; i++) {
+              if(i==0)
+                hidden_text += nextLines[i]+" -->\n";
+              else
+                hidden_text += "<!-- "+nextLines[i]+" -->\n";
+            }
+          }
+          //console.log("=======");
+          //console.log(responseDiv.hidden_text);
+          //console.log("-------");
+          //console.log(hidden_text);
+          //console.log("=======");
+          responseDiv.innerHTML = DOMPurify.sanitize(marked.parse(hidden_text)); // Append word to response container
           $("#scroll-wrapper").scrollTop($("#scroll-wrapper").prop("scrollHeight"));
         }
       });
@@ -716,7 +845,8 @@ async function submitRequest() {
 // Event listener for Ctrl + Enter or CMD + Enter
 document.getElementById('user-input').addEventListener('keydown', function (e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    submitRequest();
+    if(!document.getElementById('send-button').disabled)
+      submitRequest();
   }
 });
 
@@ -740,6 +870,69 @@ function autoGrow(element) {
 
     $(element).css("height", newHeight + "px");
 }
+
+const prayers = ["감사기도", "강복", "거룩하시도다", "니케아콘스탄티노플리스신경", "대영광송", "부속가", "부활삼종기도", "사도신경", "삼종기도-성모송포함", "삼종기도", "성모송", "신앙의신비", "영성체전기도", "예물준비기도", "자비송", "주님의기도", "참회예절", "파견", "평화예식", "하느님의어린양"];
+var prayer_list = "";
+for(var i=0; i<prayers.length; i++) {
+  prayer_list += "- "+prayers[i]+"\n";
+}
+
+const common_prompt = `You are an assistant named "은근한 도우미" who helps users create Catholic Mass slides using Marp in Korean. You are part of a website titled "LLM으로 은근히 편리한 미사 슬라이드덱 편집기".
+
+## Language and Persona
+- **Always answer in Korean only.**
+- Do not include English translations.
+- Greet with **"평화를 빕니다~!"**
+- Your speaking tone must reflect a peaceful and grateful mind.
+- Always end your responses with a 🙏 emoji to express gratitude.
+
+## About this website and the features that user can do here
+- Write markdown based mass slide in Marp format.
+- There are menu in the website for loading the template markdown for Today, tomorrow, this Saturday, this Sunday and any date in 2025.
+- There are also menu for adding catholic hymns (성가 in Korean) and many kind of prayers (기도문 in Korean).
+- User can edit the markdown source in the editor in the left pane and preview the slide in the right side pane whenever user makes change in the editor.
+- User can play the presentation from the edit the markdown source by clicking the presentation mode button in the right side preview pane. It will open a new window for the HTML based presentation that contains the feature for the presentor view as well.
+- User can download the markdown source she/he has edited by clicking the download button in the left side editor pane.
+- User can download the html output that she/he can use for presentation by using the web browser by clicking the download button in the right side preview pane.
+- User can print the slide deck in PDF by clicking the print button in the right side preview pane.
+- User can share the edited markdown with other faithful by clicking the share button in the left side editor pane. It generates a long length URL that contains the contents in base64b encoded format.
+
+## Available Resources
+
+### Hymns (성가 in Korean)
+- Numbers: from 1 to 528
+
+### Prayers (기도문 in Korean)
+`+prayer_list+`
+
+## Your tasks
+- Start with greeting and introducu yourself in short no more than 5 lines excluding explaining of the functions of the website. The greeting expression is "평화를 빕니다~!".
+- When user asks for more details about this website, guide how to use this website.
+- When user asks for more details about the Marp or the Markdown, Guide what's Marp rule when user edit the mass slide in markdown format. Emphasize that the pages are splitted by putting "---", put a line for title starts with "## " as a rule. Also when you give an example, don't forget to add a empty line after the line for the title.
+- When you help for adding a slide page, show the generated code block for markdown that starts with "\n---" and ends with "---\n". At the end of the answer, put a special comment block "<!-- ACTION:addPage(generated markdown code block) -->" so that the website can trigger the automated action. Do not add special comment block within the example code block.
+- Wen user asks for adding a hymn (성가 in Korean) that is availble in this website, guide to use a menu button ("성가 추가") for it instead of showing a markdown example. At the end of the answer, put a new line "<!-- ACTION:addHymn(number of hymn) -->" so that the website can trigger the automated action.
+- Wen user asks for adding a hymn (성가 in Korean) that is not availble in this website, guide user about the available hymn number range.
+- Wen user asks for adding a prayer (기도문 in Korean) that is not available in this website, guide user to the available prayer list.
+- Wen user asks for adding a prayer (기도문 in Korean) that is available in this website, guide to use a menu button ("기도문 추가") for it instead of showing a markdown example. Put a new line "<!-- ACTION:addPrayer(name of prayer) -->" so that trigger the automated action in the website.
+- Wen user asks for write mass slide for specific date, guide user to use a menu button ("2025년") for it instead of showing a markdown example. Remember that this website only have templates for year 2025. At the end of the answer, put a new line "<!-- ACTION:useTemplate(date in yyyymmdd format) -->" so that the website can trigger the automated action.
+
+## Recommended Ollama settings
+- genma3 is a recommended model for quick and simple answers.
+- User have to run ollama with environment variable for allowing connection from the cross origin site by command "OLLAMA_ORIGINS="+window.location.origin+" ollama serve" in their PC/mac.
+
+## Who made you
+- You can answer that 아부다비 한인 공동체의 대건 안드레아 형제 has programed.
+`;
+
+async function initialize_prompt() {
+  very_first_time_prompt = common_prompt;
+  console.log(very_first_time_prompt);
+}
+
+async function initialize_prompt_for_tutorial() {
+  very_first_time_prompt = common_prompt;
+  console.log(very_first_time_prompt);
+}
       </script>
 
 
@@ -748,6 +941,10 @@ function autoGrow(element) {
       <div id="right_spacer"></div>
       <table class="editor-toolbar" style="width: 100%">
         <tr>
+          <td style="width: 70px">
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="1:2로 좌우 분할" id="button_split_1and2" onclick="split_1and2()"><i class="bi bi-layout-sidebar"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="1:1로 좌우 분할" id="button_split_1and1" onclick="split_1and1()"><i class="bi bi-layout-split"></i></button>
+          </td>
           <td>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
@@ -818,10 +1015,15 @@ if(editor_settings) {
 function set_editor_height() {
   var guessheight = $(window).height() - $("#mdrow").offset().top - 50;
   $("#mdrow").css("height", guessheight);
-  console.log();
   $("#right_spacer").css("height", $("#leftTab").height());
   $("#preview").css("height", guessheight - $("#right_spacer").height() - 30);
   $("#mdeditor").css("height", $("#preview").height());
+
+  if($(window).width() < 768) {
+    $("#mdeditor").css("height", $("#mdeditor").height()/2);
+  $("#right_spacer").css("height", 0);
+    $("#preview").css("height", $("#preview").height()/2 - 30);
+  }
 }
 
 $(window).on("resize", set_editor_height);
@@ -1018,12 +1220,19 @@ function cache_save_handler() {
 }
 ace_editor.getSession().on("change", cache_save_handler);
 
-var prayers = ["감사기도", "강복", "거룩하시도다", "니케아콘스탄티노플리스신경", "대영광송", "부속가", "부활삼종기도", "사도신경", "삼종기도-성모송포함", "삼종기도", "성모송", "신앙의신비", "영성체전기도", "예물준비기도", "자비송", "주님의기도", "참회예절", "파견", "평화예식", "하느님의어린양"];
 var loaded_prayer = "";
 
 function add_prayer() {
   var md = loaded_prayer;
   add_markdown(md);
+}
+
+function add_prayer_by_name(name) {
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/prayers/'+name+'.md';
+  $.get(url, function(data) {
+    add_markdown(data);
+  }).fail(function() {
+  });
 }
 
 function preview_prayer(a, index) {
@@ -1157,6 +1366,13 @@ function add_hymn() {
   add_markdown(md);
 }
 
+function add_hymn_by_number(num) {
+  const url = 'https://raw.githubusercontent.com/kcatholic-api/kmass-marp/refs/heads/main/hymns/'+num+'.md';
+  $.get(url, function(data) {
+    add_markdown(data);
+  }).fail(function() {
+  });
+}
 
 $("#readMore").on("click", function() {
   var $this = $(this);
@@ -1280,6 +1496,36 @@ function never_see_startup() {
   localStorage.setItem(startup_dialog_version, "no");
 }
 
+var split_mode = "1and2";
+function split_1and2() {
+  split_mode = "1and2";
+  $("#left-pane").removeClass("col-md-6");
+  $("#preview").removeClass("col-md-6");
+  $("#left-pane").addClass("col-md-4");
+  $("#preview").addClass("col-md-8");
+  $("#button_split_1and1").removeClass("btn-primary");
+  $("#button_split_1and1").addClass("btn-secondary");
+  $("#button_split_1and2").removeClass("btn-secondary");
+  $("#button_split_1and2").addClass("btn-primary");
+}
+function split_1and1() {
+  split_mode = "1and1";
+  $("#left-pane").removeClass("col-md-4");
+  $("#preview").removeClass("col-md-8");
+  $("#left-pane").addClass("col-md-6");
+  $("#preview").addClass("col-md-6");
+  $("#button_split_1and2").removeClass("btn-primary");
+  $("#button_split_1and2").addClass("btn-secondary");
+  $("#button_split_1and1").removeClass("btn-secondary");
+  $("#button_split_1and1").addClass("btn-primary");
+}
+function split_pane() {
+  if(split_mode == "1and2")
+    split_1and2();
+  else
+    split_1and1();
+}
+
 $(document).ready(function() {
   show_menu_title(false);
 
@@ -1294,31 +1540,24 @@ $(document).ready(function() {
   button1.addEventListener('shown.bs.tab', function (event) {
     ace_editor.session.setScrollTop(editor_scroll_top);
     ace_editor.resize();
-    $("#left-pane").removeClass("col-md-4");
-    $("#preview").removeClass("col-md-8");
-    $("#left-pane").addClass("col-md-6");
-    $("#preview").addClass("col-md-6");
+    split_pane();
   })
   var button2 = document.querySelector('#ollama-tab');
   button2.addEventListener('shown.bs.tab', function (event) {
-    $("#left-pane").removeClass("col-md-6");
-    $("#preview").removeClass("col-md-6");
-    $("#left-pane").addClass("col-md-4");
-    $("#preview").addClass("col-md-8");
+    split_pane();
   })
   autoGrow($("#user-input"));
 
-  populateModels();
-  adjustPadding();
-  autoFocusInput();
-
   function set_llm_height() {
     var guessheight = $("#preview").height() - 50;
-    console.log("set_llm_height", guessheight);
     $("#scroll-wrapper").css("height", guessheight);
   }
   $(window).on("resize", set_llm_height);
   set_llm_height();
+
+  adjustPadding();
+  autoFocusInput();
+  populateModels();
 });
 
 </script>
@@ -1473,6 +1712,7 @@ $(document).ready(function() {
     ace_editor.setValue(await response.text(), -1);
     ace_editor.session.setScrollTop(0);
     $("#notice_div").html(formatDate(t)+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+    await initialize_prompt();
   }
 
   function listup_month(year, monthly_items) {
@@ -1650,6 +1890,7 @@ $(document).ready(function() {
       ace_editor.session.setScrollTop(0);
       $("#notice_div").html(hashstring+"일자 Markdown 템플릿을 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
       $("#monthModal").modal("hide");
+      await initialize_prompt();
       return;
     }
     const b64str = hashstring;
@@ -1659,6 +1900,7 @@ $(document).ready(function() {
       $("#notice_div").html("공유링크에서 Markdown 문서를 추출하여 로드하였습니다.").slideDown(500).delay(1000).slideUp(500);
       preview();
     });
+    await initialize_prompt();
   }
   window.addEventListener('hashchange', () => {
     load_from_hash();
@@ -1672,6 +1914,7 @@ $(document).ready(function() {
     ace_editor.setValue(await response.text(), -1);
     ace_editor.session.setScrollTop(0);
     $("#notice_div").html("자습서 Markdown 문서를 로드 하였습니다.").slideDown(500).delay(1000).slideUp(500);
+    await initialize_prompt_for_tutorial();
   }
 </script>
 </html>
