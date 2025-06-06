@@ -289,7 +289,39 @@
     <div id="error_div" class="alert alert-danger" role="alert" style="display: none"></div>
   </div>
   <div id="mdrow" class="row">
-    <div class="col-md-4">
+    <div class="col-md-4" id="left-pane">
+      <ul class="nav nav-tabs" id="leftTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="ollama-tab" data-bs-toggle="tab" data-bs-target="#ollama" type="button" role="tab" aria-controls="ollama" aria-selected="false"><img src="https://ollama.com/public/ollama.png" style="height: 30px; margin-top: -8px"> 로컬 Ollama와 대화 하기</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="mdeditor-tab" data-bs-toggle="tab" data-bs-target="#mdeditor" type="button" role="tab" aria-controls="mdeditor" aria-selected="true">Marp/Markdown 에디터</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="tabContent">
+        <div class="tab-pane fade" id="mdeditor" role="tabpanel" aria-labelledby="mdeditor-tab" style="height: 100%">
+          <table class="editor-toolbar" style="width: 100%">
+            <tr>
+              <td>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick="$('#loadModal').modal('show');update_saved_docs();"><i class="bi bi-folder2-open"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick="save_edit()"><i class="bi bi-floppy2"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Markdown 파일로 다운로드 하기" id="mdDownloadButton"><i class="bi bi-download"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" id="shareButton"><i class="bi bi-box-arrow-up"></i></button>
+              </td>
+              <td style="text-align: right;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="다크/라이트 모드로 토글" onclick="toggle_dark_mode()"><i class="bi bi-circle-half"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="편집기 설정" onclick="$('#settingsModal').modal('show')"><i class="bi bi-gear-wide-connected"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick="clipboard_copy()"><i class="bi bi-copy"></i></button>
+              </td>
+            </tr>
+          </table>
+          <div id="editor" style="height: 100%; width: 100%; border-style: solid; border-color: #eeeeee"></div>
+        </div>
+
+
+
+
+
       <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.umd.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
       <style>
@@ -336,15 +368,25 @@
     max-height: 200px;    /* Set your desired max height here */
   }
       </style>
-      <h3><img src="https://ollama.com/public/ollama.png" style="height: 35px; margin-top: -10px"> 로컬 Ollama와 대화 하기</h3>
-      <select id="model-select" class="form-select" aria-label="모델 선택">
-      </select>
-      <div id="scroll-wrapper" style="height: 240px; overflow-y: scroll">
-        <div id="chat-history"></div>
-      </div>
-      <div class="input-group" id="input-area">
-        <textarea class="form-control" id="user-input" placeholder="여기에 질문 작성 후 Ctrl/Cmd+Enter" oninput="autoGrow(this)"></textarea>
-        <button id="send-button" class="btn btn-primary">보내기</button>
+        <div class="tab-pane fade show active" role="tabpanel" id="ollama" aria-labelledby="ollama-tab" style="overflow-y: scroll; height: 100%">
+          <table style="width: 100%" class="mt-2">
+            <tr>
+              <td style="width: 120px">
+                LLM 모델 선택: 
+              </td>
+              <td>
+                <select id="model-select" class="form-select" aria-label="모델 선택"></select>
+              </td>
+            </tr>
+          </table>
+          <div id="scroll-wrapper" style="height: 240px; overflow-y: scroll">
+            <div id="chat-history"></div>
+          </div>
+          <div class="input-group" id="input-area">
+            <textarea class="form-control" id="user-input" placeholder="여기에 질문 작성 후 Ctrl/Cmd+Enter" oninput="autoGrow(this)"></textarea>
+            <button id="send-button" class="btn btn-primary">보내기</button>
+          </div>
+        </div>
       </div>
       <script>
 var rebuildRules = undefined;
@@ -702,51 +744,24 @@ function autoGrow(element) {
 
 
     </div>
-    <div class="col-md-8">
-      <ul class="nav nav-tabs" id="rightTab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="mdeditor-tab" data-bs-toggle="tab" data-bs-target="#mdeditor" type="button" role="tab" aria-controls="mdeditor" aria-selected="true">Marp/Markdown 에디터</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="preview" aria-selected="false">미리보기</button>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane fade" id="mdeditor" role="tabpanel" aria-labelledby="mdeditor-tab" style="overflow-y: scroll; height: 100%">
-          <table class="editor-toolbar" style="width: 100%">
-            <tr>
-              <td>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저 데이타베이스에서 불러오기" onclick="$('#loadModal').modal('show');update_saved_docs();"><i class="bi bi-folder2-open"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="브라우저에 데이타베이스에 저장" onclick="save_edit()"><i class="bi bi-floppy2"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Markdown 파일로 다운로드 하기" id="mdDownloadButton"><i class="bi bi-download"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="공유 하기" id="shareButton"><i class="bi bi-box-arrow-up"></i></button>
-              </td>
-              <td style="text-align: right;">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="다크/라이트 모드로 토글" onclick="toggle_dark_mode()"><i class="bi bi-circle-half"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="편집기 설정" onclick="$('#settingsModal').modal('show')"><i class="bi bi-gear-wide-connected"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="클립보드에 복사" onclick="clipboard_copy()"><i class="bi bi-copy"></i></button>
-              </td>
-            </tr>
-          </table>
-          <div id="editor" style="height: 100%; width: 100%; border-style: solid; border-color: #eeeeee"></div>
-        </div>
-        <div class="tab-pane fade show active" id="preview" role="tabpanel" aria-labelledby="preview-tab" style="height: 100%">
-          <table class="editor-toolbar" style="width: 100%">
-            <tr>
-              <td>
-                <div class="form-check form-switch" style="display: none">
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
-                  <label class="form-check-label" for="flexSwitchCheckChecked" data-bs-toggle="tooltip" data-bs-placement="top" title="왼쪽 편집기와 오른쪽 미리보기의 스크롤을 연결하거나 독립적으로 스크롤 합니다">좌우 스크롤바 고정</label>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 파일로 다운로드 하기" id="htmlDownloadButton"><i class="bi bi-download"></i></button>
-                <button type="button" id="presentationButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="새 브라우저 탭에서 HTML 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
-                <button type="button" id="printButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
-              </td>
-            </tr>
-          </table>
-          <div id="render" style="flex: 1; overflow-y: scroll; height: 100%; border-style: solid; border-color: #eeeeee"></div>
-        </div>
-      </div>
+    <div class="col-md-8" id="preview">
+      <div id="right_spacer"></div>
+      <table class="editor-toolbar" style="width: 100%">
+        <tr>
+          <td>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked onclick="set_link(this.checked)">
+              <label class="form-check-label" for="flexSwitchCheckChecked" data-bs-toggle="tooltip" data-bs-placement="top" title="왼쪽 편집기와 오른쪽 미리보기의 스크롤을 연결하거나 독립적으로 스크롤 합니다">좌우 스크롤바 고정</label>
+            </div>
+          </td>
+          <td style="text-align: right;">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 파일로 다운로드 하기" id="htmlDownloadButton"><i class="bi bi-download"></i></button>
+            <button type="button" id="presentationButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="새 브라우저 탭에서 HTML 프레젠테이션 모드 시작하기" onclick=""><i class="bi bi-easel2"></i></button>
+            <button type="button" id="printButton" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF 저장을 위해 브라우저의 인쇄 기능을 사용합니다" onclick=""><i class="bi bi-printer"></i></button>
+          </td>
+        </tr>
+      </table>
+      <div id="render" style="flex: 1; overflow-y: scroll; height: 100%; border-style: solid; border-color: #eeeeee"></div>
     </div>
   </div>
 </main>
@@ -804,8 +819,9 @@ function set_editor_height() {
   var guessheight = $(window).height() - $("#mdrow").offset().top - 50;
   $("#mdrow").css("height", guessheight);
   console.log();
-  $("#mdeditor").css("height", guessheight - $("#rightTab").height());
-  $("#preview").css("height", guessheight - $("#rightTab").height() - $($(".editor-toolbar")[1]).height());
+  $("#right_spacer").css("height", $("#leftTab").height());
+  $("#preview").css("height", guessheight - $("#right_spacer").height() - 30);
+  $("#mdeditor").css("height", $("#preview").height());
 }
 
 $(window).on("resize", set_editor_height);
@@ -1278,10 +1294,17 @@ $(document).ready(function() {
   button1.addEventListener('shown.bs.tab', function (event) {
     ace_editor.session.setScrollTop(editor_scroll_top);
     ace_editor.resize();
+    $("#left-pane").removeClass("col-md-4");
+    $("#preview").removeClass("col-md-8");
+    $("#left-pane").addClass("col-md-6");
+    $("#preview").addClass("col-md-6");
   })
-  var button2 = document.querySelector('#preview-tab');
+  var button2 = document.querySelector('#ollama-tab');
   button2.addEventListener('shown.bs.tab', function (event) {
-    $("#render").scrollTop(preview_scroll_top);
+    $("#left-pane").removeClass("col-md-6");
+    $("#preview").removeClass("col-md-6");
+    $("#left-pane").addClass("col-md-4");
+    $("#preview").addClass("col-md-8");
   })
   autoGrow($("#user-input"));
 
