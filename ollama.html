@@ -268,6 +268,20 @@
   </div>
 </div>
 
+<!-- ollama error modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">로컬 Ollama 서버에 접속 불가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="errorText"></p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main class="container-fluid">
   <div class="row ms-1 me-1">
@@ -276,6 +290,417 @@
   </div>
   <div id="mdrow" class="row">
     <div class="col-md-4">
+      <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.umd.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+      <style>
+  .user-message {
+    background-color: rgb(86, 144, 163);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    margin-left: auto;
+    max-width: 90%;
+  }
+
+  .response-message {
+    background-color: rgb(62, 62, 62);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    padding-right: 20px;
+    position: relative;
+    margin-right: auto;
+    max-width: 90%;
+  }
+
+  .response-message p {
+    margin-right: 40px;
+    /* Add more styles here */
+  }
+
+  #chat-history {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #scroll-wrapper {
+    padding-top: 20px;
+    padding-right: 10px;
+  }
+
+  #user-input {
+    overflow-y: auto;
+    resize: none;         /* Prevent user from manually resizing */
+    height: 40px;
+    max-height: 200px;    /* Set your desired max height here */
+  }
+      </style>
+      <h3><img src="https://ollama.com/public/ollama.png" style="height: 35px; margin-top: -10px"> 로컬 Ollama와 대화 하기</h3>
+      <select id="model-select" class="form-select" aria-label="모델 선택">
+      </select>
+      <div id="scroll-wrapper" style="height: 240px; overflow-y: scroll">
+        <div id="chat-history"></div>
+      </div>
+      <div class="input-group" id="input-area">
+        <textarea class="form-control" id="user-input" placeholder="여기에 질문 작성 후 Ctrl/Cmd+Enter" oninput="autoGrow(this)"></textarea>
+        <button id="send-button" class="btn btn-primary">보내기</button>
+      </div>
+      <script>
+var rebuildRules = undefined;
+if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+    rebuildRules = async function (domain) {
+    const domains = [domain];
+    /** @type {chrome.declarativeNetRequest.Rule[]} */
+    const rules = [{
+      id: 1,
+      condition: {
+        requestDomains: domains
+      },
+      action: {
+        type: 'modifyHeaders',
+        requestHeaders: [{
+          header: 'origin',
+          operation: 'set',
+          value: `http://${domain}`,
+        }],
+      },
+    }];
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: rules.map(r => r.id),
+      addRules: rules,
+    });
+  }
+}
+
+
+var ollama_host = 'http://localhost:11434';
+
+if (rebuildRules){
+  rebuildRules(ollama_host);
+}
+
+async function getModels(){
+  const response = await fetch(`${ollama_host}/api/tags`);
+  const data = await response.json();
+  return data;
+}
+
+
+// Function to send a POST request to the API
+function postRequest(data, signal) {
+  const URL = `${ollama_host}/api/generate`;
+  return fetch(URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data),
+    signal: signal
+  });
+}
+
+// Function to stream the response from the server
+async function getResponse(response, callback) {
+  const reader = response.body.getReader();
+  let partialLine = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    // Decode the received value and split by lines
+    const textChunk = new TextDecoder().decode(value);
+    const lines = (partialLine + textChunk).split('\n');
+    partialLine = lines.pop(); // The last line might be incomplete
+
+    for (const line of lines) {
+      if (line.trim() === '') continue;
+      const parsedResponse = JSON.parse(line);
+      callback(parsedResponse); // Process each response word
+    }
+  }
+
+  // Handle any remaining line
+  if (partialLine.trim() !== '') {
+    const parsedResponse = JSON.parse(partialLine);
+    callback(parsedResponse);
+  }
+}
+
+const faqString = `
+**로컬 Ollama 서버에 어떻게 연결해야 할까요?**
+
+기본적으로, Ollama는 cross origin 연결을 127.0.0.1과 0.0.0.0으로 부터 허용합니다.
+
+더 많은 origin을 지원하려면, OLLAMA_ORIGINS 환경 변수를 사용하세요:
+
+\`\`\`
+OLLAMA_ORIGINS=${window.location.origin} ollama serve
+\`\`\`
+
+더 읽어 볼 것: https://github.com/jmorganca/ollama/blob/main/docs/faq.md
+`;
+
+
+
+const clipboardIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+<path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+<path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+</svg>`
+const textBoxBaseHeight = 40;  // This should match the default height set in CSS
+
+// change settings of marked from default to remove deprecation warnings
+// see conversation here: https://github.com/markedjs/marked/issues/2793
+marked.use({
+  mangle: false,
+  headerIds: false
+});
+
+function autoFocusInput() {
+  const userInput = document.getElementById('user-input');
+  userInput.focus();
+}
+
+/*
+takes in model as a string
+updates the query parameters of page url to include model name
+*/
+// Fetch available models and populate the dropdown
+async function populateModels() {
+  document.getElementById('send-button').addEventListener('click', submitRequest);
+
+  try {
+    const data = await getModels();
+
+    const selectElement = document.getElementById('model-select');
+    selectElement.options.length = 0;
+    selectElement.onchange = (() => {
+      localStorage.setItem("kcatolic-api-ollama.model", selectElement.value);
+    });
+    const lastChosenModel = localStorage.getItem("kcatolic-api-ollama.model");
+
+    data.models.forEach((model) => {
+      const option = document.createElement('option');
+      option.value = model.name;
+      option.innerText = model.name;
+      if(model.name == lastChosenModel) {
+        option.selected = true;
+      }
+      selectElement.appendChild(option);
+    });
+
+  }
+  catch (error) {
+    document.getElementById('errorText').innerHTML =
+    DOMPurify.sanitize(marked.parse(
+    `다음과 같은 이유로 Ollama와 통신에 실패했습니다.:\n\n`
+    + `\`\`\`${error.message}\`\`\`\n\n---------------------\n`
+    + faqString));
+    let modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+  }
+}
+
+// adjusts the padding at the bottom of scrollWrapper to be the height of the input box
+function adjustPadding() {
+  const inputBoxHeight = document.getElementById('input-area').offsetHeight;
+  const scrollWrapper = document.getElementById('scroll-wrapper');
+  scrollWrapper.style.paddingBottom = `${inputBoxHeight + 15}px`;
+}
+
+// sets up padding resize whenever input box has its height changed
+const autoResizePadding = new ResizeObserver(() => {
+  adjustPadding();
+});
+autoResizePadding.observe(document.getElementById('input-area'));
+
+
+
+// Function to get the selected model
+function getSelectedModel() {
+  return document.getElementById('model-select').value;
+}
+
+// variables to handle auto-scroll
+// we only need one ResizeObserver and isAutoScrollOn variable globally
+// no need to make a new one for every time submitRequest is called
+const scrollWrapper = document.getElementById('scroll-wrapper');
+let isAutoScrollOn = true;
+// autoscroll when new line is added
+const autoScroller = new ResizeObserver(() => {
+  if (isAutoScrollOn) {
+    scrollWrapper.scrollIntoView({behavior: "smooth", block: "end"});
+  }
+});
+
+// event listener for scrolling
+let lastKnownScrollPosition = 0;
+let ticking = false;
+document.addEventListener("scroll", (event) => {
+  // if user has scrolled up and autoScroll is on we turn it off
+  if (!ticking && isAutoScrollOn && window.scrollY < lastKnownScrollPosition) {
+    window.requestAnimationFrame(() => {
+      isAutoScrollOn = false;
+      ticking = false;
+    });
+    ticking = true;
+  }
+  // if user has scrolled nearly all the way down and autoScroll is disabled, re-enable
+  else if (!ticking && !isAutoScrollOn &&
+    window.scrollY > lastKnownScrollPosition && // make sure scroll direction is down
+    window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 30 // add 30px of space--no need to scroll all the way down, just most of the way
+  ) {
+    window.requestAnimationFrame(() => {
+      isAutoScrollOn = true;
+      ticking = false;
+    });
+    ticking = true;
+  }
+  lastKnownScrollPosition = window.scrollY;
+});
+
+function removeBetween(arr, startVal, endVal) {
+  if (typeof arr === "undefined" || !Array.isArray(arr)) {
+    return arr;
+  }
+  const startIndex = arr.indexOf(startVal);
+  const endIndex = arr.indexOf(endVal);
+
+  if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+    return arr;
+  }
+
+  arr.splice(startIndex, endIndex - startIndex + 1);
+  return arr;
+}
+
+// Function to handle the user input and call the API functions
+async function submitRequest() {
+  const input = document.getElementById('user-input').value;
+  const selectedModel = getSelectedModel();
+  const context = document.getElementById('chat-history').context;
+  const systemPrompt = "";
+  const data = { model: selectedModel, prompt: input, context: removeBetween(context, 151648, 151649), system: systemPrompt };
+  $("#send-button").prop("disabled", true);
+
+  // Create user message element and append to chat history
+  let chatHistory = document.getElementById('chat-history');
+  let userMessageDiv = document.createElement('div');
+  userMessageDiv.className = 'mb-2 user-message';
+  userMessageDiv.innerText = input;
+  chatHistory.appendChild(userMessageDiv);
+  $("#scroll-wrapper").scrollTop($("#scroll-wrapper").prop("scrollHeight"));
+
+  // Create response container
+  let responseDiv = document.createElement('div');
+  responseDiv.className = 'response-message mb-2 text-start';
+  responseDiv.style.minHeight = '3em'; // make sure div does not shrink if we cancel the request when no text has been generated yet
+  spinner = document.createElement('div');
+  spinner.className = 'spinner-border text-light';
+  spinner.setAttribute('role', 'status');
+  responseDiv.appendChild(spinner);
+  chatHistory.appendChild(responseDiv);
+  $("#scroll-wrapper").scrollTop($("#scroll-wrapper").prop("scrollHeight"));
+
+  // create button to stop text generation
+  let interrupt = new AbortController();
+  let stopButton = document.createElement('button');
+  stopButton.className = 'btn btn-danger';
+  stopButton.innerHTML = '중단';
+  stopButton.onclick = (e) => {
+    e.preventDefault();
+    interrupt.abort('Stop button pressed');
+  }
+  // add button after sendButton
+  const sendButton = document.getElementById('send-button');
+  sendButton.insertAdjacentElement('beforebegin', stopButton);
+
+  // change autoScroller to keep track of our new responseDiv
+  autoScroller.observe(responseDiv);
+
+  postRequest(data, interrupt.signal)
+    .then(async response => {
+      await getResponse(response, parsedResponse => {
+        let word = parsedResponse.response;
+        if (parsedResponse.done) {
+          chatHistory.context = parsedResponse.context;
+          // Copy button
+          let copyButton = document.createElement('button');
+          copyButton.className = 'btn btn-secondary copy-button';
+          copyButton.innerHTML = clipboardIcon;
+          copyButton.onclick = () => {
+            navigator.clipboard.writeText(responseDiv.hidden_text).then(() => {
+              console.log('Text copied to clipboard');
+            }).catch(err => {
+              console.error('Failed to copy text:', err);
+            });
+          };
+          responseDiv.appendChild(copyButton);
+        }
+        // add word to response
+        if (word != undefined && word != "") {
+          if (responseDiv.hidden_text == undefined){
+            responseDiv.hidden_text = "";
+          }
+          word = word.replace(/<think>/g, '<details open><summary>think content</summary><br><span style="color:gray;">').replace(/<\/think>/g, '</span><hr></details>');
+          responseDiv.hidden_text += word;
+          responseDiv.innerHTML = DOMPurify.sanitize(marked.parse(responseDiv.hidden_text)); // Append word to response container
+          $("#scroll-wrapper").scrollTop($("#scroll-wrapper").prop("scrollHeight"));
+        }
+      });
+    })
+    .then(() => {
+      stopButton.remove(); // Remove stop button from DOM now that all text has been generated
+      spinner.remove();
+      $(sendButton).prop("disabled", false);
+    })
+    .catch(error => {
+      if (error !== 'Stop button pressed') {
+        console.error(error);
+      }
+      stopButton.remove();
+      spinner.remove();
+      $(sendButton).prop("disabled", false);
+    });
+
+  // Clear user input
+  const element = document.getElementById('user-input');
+  element.value = '';
+  $(element).css("height", textBoxBaseHeight + "px");
+}
+
+// Event listener for Ctrl + Enter or CMD + Enter
+document.getElementById('user-input').addEventListener('keydown', function (e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    submitRequest();
+  }
+});
+
+
+function autoGrow(element) {
+    const maxHeight = 200;  // This should match the max-height set in CSS
+
+    // Count the number of lines in the textarea based on newline characters
+    const numberOfLines = $(element).val().split('\n').length;
+
+    // Temporarily reset the height to auto to get the actual scrollHeight
+    $(element).css("height", "auto");
+    let newHeight = element.scrollHeight;
+
+    // If content is one line, set the height to baseHeight
+    if (numberOfLines === 1) {
+        newHeight = textBoxBaseHeight;
+    } else if (newHeight > maxHeight) {
+        newHeight = maxHeight;
+    }
+
+    $(element).css("height", newHeight + "px");
+}
+      </script>
+
+
     </div>
     <div class="col-md-8">
       <ul class="nav nav-tabs" id="rightTab" role="tablist">
@@ -858,7 +1283,19 @@ $(document).ready(function() {
   button2.addEventListener('shown.bs.tab', function (event) {
     $("#render").scrollTop(preview_scroll_top);
   })
+  autoGrow($("#user-input"));
 
+  populateModels();
+  adjustPadding();
+  autoFocusInput();
+
+  function set_llm_height() {
+    var guessheight = $("#preview").height() - 50;
+    console.log("set_llm_height", guessheight);
+    $("#scroll-wrapper").css("height", guessheight);
+  }
+  $(window).on("resize", set_llm_height);
+  set_llm_height();
 });
 
 </script>
